@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Philippine College of Criminology - Student Admission Application">
+    <title>PCCR - Student Admission Application | Philippine College of Criminology</title>
+    <link rel="icon" href="https://cutover.pccr.edu.ph/files/pccr-logo.png" type="image/png">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Custom Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pccr-red': '#7b0200',
+                        'pccr-red-dark': '#5a0100',
+                        'pccr-gold': '#fcb31c',
+                        'pccr-gold-dark': '#e09a00',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 font-['Inter']">
+    
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-pccr-red to-pccr-red-dark">
+        <img src="https://cutover.pccr.edu.ph/files/pccr-logo.png" alt="PCCR Logo" class="w-24 h-24 mb-6 animate-bounce">
+        <div class="text-white text-xl font-semibold mb-4">Philippine College of Criminology</div>
+        <div class="loader"></div>
+        <p class="text-white/80 mt-4 text-sm">Loading admission form...</p>
+    </div>
+
+    <!-- Decorative Background Elements -->
+    <div class="bg-decoration">
+        <div class="accent-line line-1"></div>
+        <div class="accent-line line-2"></div>
+        <div class="accent-line line-3"></div>
+        <div class="particles">
+            <span class="particle" style="top: 10%; left: 15%; animation-delay: 0s;"></span>
+            <span class="particle" style="top: 25%; left: 75%; animation-delay: -2s;"></span>
+            <span class="particle" style="top: 40%; left: 30%; animation-delay: -4s;"></span>
+            <span class="particle" style="top: 60%; left: 80%; animation-delay: -6s;"></span>
+            <span class="particle" style="top: 75%; left: 20%; animation-delay: -8s;"></span>
+            <span class="particle" style="top: 20%; left: 90%; animation-delay: -3s;"></span>
+            <span class="particle" style="top: 85%; left: 60%; animation-delay: -5s;"></span>
+            <span class="particle" style="top: 35%; left: 5%; animation-delay: -7s;"></span>
+            <span class="particle gold" style="top: 15%; left: 50%; animation-delay: -1s;"></span>
+            <span class="particle gold" style="top: 55%; left: 10%; animation-delay: -9s;"></span>
+            <span class="particle gold" style="top: 70%; left: 85%; animation-delay: -4.5s;"></span>
+            <span class="particle gold" style="top: 90%; left: 40%; animation-delay: -6.5s;"></span>
+        </div>
+    </div>
+    
+    <!-- Main Container -->
+    <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            
+            <!-- Header Card -->
+            <div class="bg-gradient-to-r from-pccr-red to-pccr-red-dark rounded-t-2xl shadow-2xl overflow-hidden">
+                <div class="p-8 text-center relative">
+                    <!-- Decorative Elements -->
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-pccr-gold/10 rounded-full -mr-16 -mt-16"></div>
+                    <div class="absolute bottom-0 left-0 w-24 h-24 bg-pccr-gold/10 rounded-full -ml-12 -mb-12"></div>
+                    
+                    <div class="relative z-10">
+                        <img src="https://cutover.pccr.edu.ph/files/pccr-logo.png" alt="PCCR Logo" class="w-20 h-20 mx-auto mb-4 drop-shadow-2xl">
+                        <h1 class="text-3xl md:text-4xl font-bold text-white mb-2 font-['Poppins']">Student Admission Application</h1>
+                        <p class="text-white/90 text-lg mb-1">Philippine College of Criminology</p>
+                        <p class="text-pccr-gold font-semibold text-sm tracking-wider">PRO BONO PUBLICO ET PATRIA</p>
+                        <p class="text-white/80 text-sm mt-2">Academic Year 2025-2026</p>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="bg-white/10 backdrop-blur-sm px-8 py-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-white text-sm font-semibold flex items-center gap-2">
+                            <i class="fas fa-tasks"></i> Application Progress
+                        </span>
+                        <div class="text-right">
+                            <span id="progressPercent" class="text-pccr-gold font-bold text-sm">25%</span>
+                            <span id="timeEstimate" class="text-white/70 text-xs block">~8 min remaining</span>
+                        </div>
+                    </div>
+                    <div class="h-3 bg-white/20 rounded-full overflow-hidden">
+                        <div id="progressBar" class="h-full bg-gradient-to-r from-pccr-gold to-yellow-300 rounded-full transition-all duration-500 ease-out" style="width: 25%"></div>
+                    </div>
+                    
+                    <!-- Step Indicators -->
+                    <div class="flex justify-between mt-4 gap-2">
+                        <div id="stepLabel1" class="step-label active flex-1 text-center">
+                            <div class="text-pccr-gold text-lg mb-1"><i class="fas fa-clipboard-list"></i></div>
+                            <div class="text-xs font-semibold">Admission</div>
+                        </div>
+                        <div id="stepLabel2" class="step-label flex-1 text-center">
+                            <div class="text-white/50 text-lg mb-1"><i class="fas fa-user"></i></div>
+                            <div class="text-xs font-semibold">Personal</div>
+                        </div>
+                        <div id="stepLabel3" class="step-label flex-1 text-center">
+                            <div class="text-white/50 text-lg mb-1"><i class="fas fa-graduation-cap"></i></div>
+                            <div class="text-xs font-semibold">Education</div>
+                        </div>
+                        <div id="stepLabel4" class="step-label flex-1 text-center">
+                            <div class="text-white/50 text-lg mb-1"><i class="fas fa-check-circle"></i></div>
+                            <div class="text-xs font-semibold">Review</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Card -->
+            <div class="bg-white rounded-b-2xl shadow-2xl">
+                <form id="admissionForm" class="p-8">
+                    
+                    <!-- Step 1: Admission Details -->
+                    <div id="step1" class="form-step active">
+                        <div class="mb-6">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-3">
+                                <span class="w-10 h-10 bg-gradient-to-br from-pccr-red to-pccr-red-dark text-white rounded-full flex items-center justify-center">
+                                    <i class="fas fa-rocket text-sm"></i>
+                                </span>
+                                Let's Get Started
+                            </h2>
+                            <p class="text-gray-600 ml-13">Begin your journey to becoming a Batang 641. Provide your admission details below.</p>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label class="form-label">Student Category</label>
+                                    <select name="student_category" required class="form-input">
+                                        <option value="">Select category</option>
+                                        <option value="New Student">New Student</option>
+                                        <option value="Transferee">Transferee</option>
+                                        <option value="Second Courser">Second Courser</option>
+                                    </select>
+                                    <div class="error-message"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Program Applied For</label>
+                                    <input type="text" name="program" required class="form-input" placeholder="e.g., BS Criminology">
+                                    <div class="error-message"></div>
+                                </div>
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="lms_only" class="checkbox-input">
+                                    <span class="checkbox-label">
+                                        <i class="fas fa-laptop text-pccr-red mr-2"></i>
+                                        Applying for LMS Only?
+                                    </span>
+                                </label>
+
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="paid" class="checkbox-input">
+                                    <span class="checkbox-label">
+                                        <i class="fas fa-money-bill text-pccr-gold mr-2"></i>
+                                        Paid Application
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end mt-8">
+                            <button type="button" onclick="nextStep(2)" class="btn-primary">
+                                Continue <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Personal Information -->
+                    <div id="step2" class="form-step">
+                        <div class="mb-6">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-3">
+                                <span class="w-10 h-10 bg-gradient-to-br from-pccr-red to-pccr-red-dark text-white rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user-circle text-sm"></i>
+                                </span>
+                                Personal Information
+                            </h2>
+                            <p class="text-gray-600 ml-13">Tell us about yourself so we can get to know you better.</p>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="grid md:grid-cols-3 gap-6">
+                                <div class="form-group">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" name="first_name" required class="form-input" placeholder="Juan">
+                                    <div class="error-message"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Middle Name</label>
+                                    <input type="text" name="middle_name" class="form-input" placeholder="Santos">
+                                    <div class="error-message"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" name="last_name" required class="form-input" placeholder="Dela Cruz">
+                                    <div class="error-message"></div>
+                                </div>
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label class="form-label">Date of Birth</label>
+                                    <input type="date" name="date_of_birth" required class="form-input">
+                                    <div class="error-message"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Gender</label>
+                                    <select name="gender" required class="form-input">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                    <div class="error-message"></div>
+                                </div>
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" name="student_email_id" required class="form-input" placeholder="juan.delacruz@email.com">
+                                    <small class="text-gray-500 text-xs mt-1 flex items-center gap-1">
+                                        <i class="fas fa-info-circle text-pccr-gold"></i> We'll send important updates here
+                                    </small>
+                                    <div class="error-message"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Mobile Number</label>
+                                    <input type="text" name="student_mobile_number" required class="form-input" placeholder="09171234567">
+                                    <small class="text-gray-500 text-xs mt-1 flex items-center gap-1">
+                                        <i class="fas fa-phone text-pccr-gold"></i> Format: 09XXXXXXXXX
+                                    </small>
+                                    <div class="error-message"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between mt-8">
+                            <button type="button" onclick="prevStep(1)" class="btn-secondary">
+                                <i class="fas fa-arrow-left mr-2"></i> Back
+                            </button>
+                            <button type="button" onclick="nextStep(3)" class="btn-primary">
+                                Continue <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Academic History -->
+                    <div id="step3" class="form-step">
+                        <div class="mb-6">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-3">
+                                <span class="w-10 h-10 bg-gradient-to-br from-pccr-red to-pccr-red-dark text-white rounded-full flex items-center justify-center">
+                                    <i class="fas fa-book-open text-sm"></i>
+                                </span>
+                                Academic History
+                            </h2>
+                            <p class="text-gray-600 ml-13">Share your educational background with us.</p>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="form-group">
+                                <label class="form-label">Previous School Name</label>
+                                <input type="text" name="previous_school_name" class="form-input" placeholder="Enter your previous school or university">
+                                <div class="error-message"></div>
+                            </div>
+
+                            <div class="bg-blue-50 border-l-4 border-pccr-gold p-4 rounded">
+                                <div class="flex items-start gap-3">
+                                    <i class="fas fa-info-circle text-pccr-gold text-lg mt-0.5"></i>
+                                    <div>
+                                        <p class="text-gray-700 text-sm font-medium">Additional Information</p>
+                                        <p class="text-gray-600 text-sm mt-1">Additional academic records and transcripts can be submitted to the registrar's office after completing this initial application.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between mt-8">
+                            <button type="button" onclick="prevStep(2)" class="btn-secondary">
+                                <i class="fas fa-arrow-left mr-2"></i> Back
+                            </button>
+                            <button type="button" onclick="nextStep(4)" class="btn-primary">
+                                Review Application <i class="fas fa-check ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Review & Submit -->
+                    <div id="step4" class="form-step">
+                        <div class="text-center mb-8">
+                            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-100 to-green-50 rounded-full mb-4">
+                                <i class="fas fa-file-contract text-green-600 text-3xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-2">Review Your Application</h2>
+                            <p class="text-gray-600">Please verify all information before submitting.</p>
+                        </div>
+
+                        <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                            <table id="summaryTable" class="w-full">
+                                <!-- Summary will be generated here -->
+                            </table>
+                        </div>
+
+                        <div class="bg-yellow-50 border-l-4 border-pccr-gold p-4 rounded mb-6">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-exclamation-triangle text-pccr-gold text-lg mt-0.5"></i>
+                                <div>
+                                    <p class="text-gray-700 text-sm font-medium">Important Notice</p>
+                                    <p class="text-gray-600 text-sm mt-1">By submitting this application, you confirm that all information provided is accurate and complete to the best of your knowledge.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between mt-8">
+                            <button type="button" onclick="prevStep(3)" class="btn-secondary">
+                                <i class="fas fa-arrow-left mr-2"></i> Back
+                            </button>
+                            <button type="button" onclick="submitForm()" id="submitBtn" class="btn-success">
+                                <i class="fas fa-paper-plane mr-2"></i> Submit Application
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+
+                <!-- Success Screen -->
+                <div id="successScreen" class="hidden p-8 text-center">
+                    <div class="max-w-md mx-auto">
+                        <div class="relative inline-block mb-6">
+                            <div class="absolute inset-0 bg-green-500/20 rounded-full animate-ping"></div>
+                            <div class="relative w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-check text-white text-4xl"></i>
+                            </div>
+                        </div>
+                        
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">Application Submitted Successfully!</h2>
+                        <p class="text-gray-600 text-lg mb-6">Thank you for applying to the Philippine College of Criminology.</p>
+                        
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                            <div class="flex items-center justify-center gap-2 text-pccr-red">
+                                <i class="fas fa-envelope text-pccr-gold"></i>
+                                <p class="font-semibold">Confirmation email sent</p>
+                            </div>
+                            <p class="text-gray-600 text-sm mt-2">A confirmation has been sent to your registered email address.</p>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                            <p class="text-gray-700 text-sm">
+                                Our admissions team will review your application and contact you within <strong class="text-pccr-red">3-5 business days</strong>.
+                            </p>
+                        </div>
+                        
+                        <a href="https://pccr.dev.abakadastudios.com/" class="btn-primary inline-flex items-center">
+                            <i class="fas fa-home mr-2"></i> Return to PCCR Homepage
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Help Footer -->
+                <div class="border-t border-gray-200 px-8 py-6 bg-gray-50 rounded-b-2xl">
+                    <div class="text-center">
+                        <p class="text-gray-600 text-sm mb-2">
+                            <i class="fas fa-question-circle text-pccr-gold mr-2"></i>
+                            Need assistance? Contact us at 
+                            <a href="mailto:admissions@pccr.edu.ph" class="text-pccr-red hover:text-pccr-red-dark font-semibold transition-colors">admissions@pccr.edu.ph</a>
+                        </p>
+                        <p class="text-gray-500 text-xs">
+                            <i class="fas fa-shield-alt text-green-600 mr-1"></i>
+                            Your information is secure and will be handled confidentially
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollTopBtn" class="fixed bottom-6 right-6 w-12 h-12 bg-gradient-to-br from-pccr-red to-pccr-red-dark text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 hidden z-40">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- jQuery (Required by Frappe) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Framer Motion (via CDN alternative - GSAP for animations) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <!-- Custom Script -->
+    <script src="script.js"></script>
+    
+</body>
+</html>
