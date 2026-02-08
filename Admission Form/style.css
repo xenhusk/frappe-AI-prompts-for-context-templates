@@ -4,6 +4,21 @@
 ======================================== */
 
 /* === GLOBAL STYLES === */
+
+.navbar {
+    display: none !important;
+}
+
+
+.web-footer {
+    display: none !important;
+}
+
+
+body {
+    padding-top: 0 !important;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -889,7 +904,7 @@ body {
 
 @media (max-width: 640px) {
     .step-label div:last-child {
-        display: none;
+        display: none;suma
     }
 }
 

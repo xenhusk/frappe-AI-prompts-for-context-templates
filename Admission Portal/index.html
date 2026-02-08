@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCCR - Admission Portal</title>
+    <link rel="icon" href="https://cutover.pccr.edu.ph/files/pccr-logo.png">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Custom Config with PCCR Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pccr-red': '#7b0200',
+                        'pccr-red-dark': '#5a0100',
+                        'pccr-gold': '#fcb31c',
+                        'pccr-gold-dark': '#e09a00',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 font-['Inter']">
+    
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-pccr-red to-pccr-red-dark">
+        <img src="https://cutover.pccr.edu.ph/files/pccr-logo.png" alt="PCCR Logo" class="w-24 h-24 mb-6 animate-bounce">
+        <div class="text-white text-xl font-semibold mb-4">Philippine College of Criminology</div>
+        <div class="loader"></div>
+    </div>
+
+    <!-- Decorative Background Elements -->
+    <div class="bg-decoration">
+        <div class="accent-line line-1"></div>
+        <div class="accent-line line-2"></div>
+        <div class="accent-line line-3"></div>
+        <div class="particles">
+            <div class="particle" style="left: 10%; top: 20%; animation-delay: 0s;"></div>
+            <div class="particle gold" style="left: 85%; top: 15%; animation-delay: 2s;"></div>
+            <div class="particle" style="left: 25%; top: 60%; animation-delay: 4s;"></div>
+            <div class="particle gold" style="left: 75%; top: 75%; animation-delay: 1s;"></div>
+            <div class="particle" style="left: 50%; top: 40%; animation-delay: 3s;"></div>
+            <div class="particle gold" style="left: 65%; top: 25%; animation-delay: 5s;"></div>
+            <div class="particle" style="left: 15%; top: 80%; animation-delay: 2.5s;"></div>
+            <div class="particle" style="left: 90%; top: 50%; animation-delay: 1.5s;"></div>
+            <div class="particle gold" style="left: 40%; top: 10%; animation-delay: 3.5s;"></div>
+            <div class="particle" style="left: 70%; top: 90%; animation-delay: 4.5s;"></div>
+            <div class="particle" style="left: 30%; top: 35%; animation-delay: 0.5s;"></div>
+            <div class="particle gold" style="left: 55%; top: 65%; animation-delay: 2.8s;"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard Wrapper -->
+    <div class="dashboard-wrapper">
+        
+        <!-- Sidebar -->
+        <aside id="dashboardSidebar" class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <img src="https://cutover.pccr.edu.ph/files/pccr-logo.png" alt="PCCR Logo" class="sidebar-logo">
+                <h2 class="sidebar-title">Admission Portal</h2>
+                <p class="sidebar-motto">Pro Bono Publico et Patria</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#overview" class="nav-item active" data-section="overview">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="#applications" class="nav-item" data-section="applications">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Applications</span>
+                </a>
+                <a href="#reports" class="nav-item" data-section="reports">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reports</span>
+                </a>
+                <a href="#settings" class="nav-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <p class="user-name" id="userName">Loading...</p>
+                        <p class="user-role" id="userRole">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Mobile Sidebar Toggle -->
+        <button id="sidebarToggle" class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            
+            <!-- Header Card -->
+            <div class="dashboard-header-card">
+                <div class="relative">
+                    <!-- Decorative circles -->
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-pccr-gold/10 rounded-full -mr-16 -mt-8"></div>
+                    <div class="absolute bottom-0 left-0 w-24 h-24 bg-pccr-gold/10 rounded-full -ml-12 -mb-8"></div>
+                    
+                    <div class="relative z-10 header-content">
+                        <div>
+                            <h1 id="dashboardTitle" class="dashboard-title">Loading Dashboard...</h1>
+                            <p class="dashboard-subtitle">Welcome back! Here's what's happening today.</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn-icon" onclick="refreshDashboard()" title="Refresh">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="btn-icon" onclick="showNotifications()" title="Notifications">
+                                <i class="fas fa-bell"></i>
+                                <span class="notification-badge">3</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Metric Cards Section -->
+            <section class="metrics-section">
+                <div class="metric-card">
+                    <div class="metric-icon metric-icon-primary">
+                        <i class="fas fa-file-import"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3 class="metric-value" id="totalApplications">0</h3>
+                        <p class="metric-label">Total Applications</p>
+                        <div class="metric-trend metric-trend-up">
+                            <i class="fas fa-arrow-up"></i> 12% from last month
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon metric-icon-warning">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3 class="metric-value" id="pendingReview">0</h3>
+                        <p class="metric-label">Pending Review</p>
+                        <div class="metric-trend metric-trend-down">
+                            <i class="fas fa-arrow-down"></i> 8% from last week
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon metric-icon-success">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3 class="metric-value" id="myAssignments">0</h3>
+                        <p class="metric-label">My Assignments</p>
+                        <div class="metric-trend">
+                            <i class="fas fa-minus"></i> No change
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Applications Table Section -->
+            <section class="table-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">
+                            <span class="icon-wrapper">
+                                <i class="fas fa-file-alt"></i>
+                            </span>
+                            Student Applications
+                        </h2>
+                        <p class="section-description">View and manage all student application records</p>
+                    </div>
+                    <div class="section-actions">
+                        <div class="search-wrapper">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="searchInput" class="search-input" placeholder="Search applications...">
+                        </div>
+                        <select id="statusFilter" class="status-filter">
+                            <option value="">All Status</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="applications-table">
+                        <thead>
+                            <tr>
+                                <th>Application ID</th>
+                                <th>Student Name</th>
+                                <th>Program</th>
+                                <th>Applied Date</th>
+                                <th>Status</th>
+                                <th id="assignedHeader" style="display: none;">Assigned To</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="applicationsTableBody">
+                            <tr>
+                                <td colspan="7" class="loading-cell">
+                                    <div class="table-loader">
+                                        <div class="loader"></div>
+                                        <p>Loading applications...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="pagination-btn" id="prevPage" disabled>
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <span class="pagination-info" id="paginationInfo">Page 1 of 1</span>
+                    <button class="pagination-btn" id="nextPage" disabled>
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </section>
+            
+        </main>
+    </div>
+
+    <!-- Assignment Modal (For Admission Head Only) -->
+    <div id="assignmentModal" class="modal">
+        <div class="modal-overlay" onclick="closeAssignmentModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title">Assign Application</h3>
+                    <p class="modal-subtitle">Select a staff member for this application</p>
+                </div>
+                <button class="modal-close" onclick="closeAssignmentModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-user-tie text-pccr-gold mr-2"></i>
+                        Staff Member
+                    </label>
+                    <select id="staffSelect" class="form-select">
+                        <option value="">Select Staff Member...</option>
+                    </select>
+                    <small class="form-hint">
+                        <i class="fas fa-info-circle text-pccr-gold"></i>
+                        The selected staff will be notified of the assignment
+                    </small>
+                </div>
+                <input type="hidden" id="selectedApplicationId">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeAssignmentModal()">
+                    <i class="fas fa-times mr-2"></i> Cancel
+                </button>
+                <button class="btn-primary" onclick="confirmAssignment()">
+                    <i class="fas fa-check mr-2"></i> Assign
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollTopBtn" class="fixed bottom-6 right-6 w-12 h-12 bg-gradient-to-br from-pccr-red to-pccr-red-dark text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 hidden z-40">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <!-- Custom Script -->
+    <script src="script.js"></script>
+    
+</body>
+</html>
