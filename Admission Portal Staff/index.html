@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PCCR - Admission Portal</title>
+    <title>PCCR - Admission Staff Workspace</title>
     <link rel="icon" href="https://cutover.pccr.edu.ph/files/pccr-logo.png">
     
     <!-- Tailwind CSS CDN -->
@@ -101,7 +101,7 @@
                     </div>
                     <div class="user-info">
                         <p class="user-name" id="userName">Loading...</p>
-                        <p class="user-role" id="userRole">Loading...</p>
+                        <p class="user-role" id="userRole">Admission Staff</p>
                     </div>
                 </div>
             </div>
@@ -124,8 +124,8 @@
                     
                     <div class="relative z-10 header-content">
                         <div>
-                            <h1 id="dashboardTitle" class="dashboard-title">Loading Dashboard...</h1>
-                            <p class="dashboard-subtitle">Welcome back! Here's what's happening today.</p>
+                            <h1 id="dashboardTitle" class="dashboard-title">Admission Staff Workspace</h1>
+                            <p class="dashboard-subtitle">Welcome back! Here are your assigned applications.</p>
                         </div>
                         <div class="header-actions">
                             <button class="btn-icon" onclick="refreshDashboard()" title="Refresh">
@@ -142,16 +142,17 @@
             
         <!-- Overview Section -->
         <section id="overviewSection" class="dashboard-section active">
+            <!-- Metrics Cards -->
             <div class="metrics-section">
                 <div class="metric-card">
                     <div class="metric-icon metric-icon-primary">
-                        <i class="fas fa-file-import"></i>
+                        <i class="fas fa-tasks"></i>
                     </div>
                     <div class="metric-content">
                         <h3 class="metric-value" id="totalApplications">0</h3>
-                        <p class="metric-label">Total Applications</p>
-                        <div class="metric-trend metric-trend-up">
-                            <i class="fas fa-arrow-up"></i> 12% from last month
+                        <p class="metric-label">My Total Assignments</p>
+                        <div class="metric-trend">
+                            <i class="fas fa-user"></i> All time
                         </div>
                     </div>
                 </div>
@@ -162,24 +163,62 @@
                     </div>
                     <div class="metric-content">
                         <h3 class="metric-value" id="pendingReview">0</h3>
-                        <p class="metric-label">Pending Review</p>
-                        <div class="metric-trend metric-trend-down">
-                            <i class="fas fa-arrow-down"></i> 8% from last week
+                        <p class="metric-label">Pending Action</p>
+                        <div class="metric-trend">
+                            <i class="fas fa-exclamation-circle"></i> Needs review
                         </div>
                     </div>
                 </div>
                 
                 <div class="metric-card">
                     <div class="metric-icon metric-icon-success">
-                        <i class="fas fa-user-check"></i>
+                        <i class="fas fa-check-double"></i>
                     </div>
                     <div class="metric-content">
                         <h3 class="metric-value" id="myAssignments">0</h3>
-                        <p class="metric-label">My Assignments</p>
-                        <div class="metric-trend">
-                            <i class="fas fa-minus"></i> No change
+                        <p class="metric-label">Completed (30d)</p>
+                        <div class="metric-trend metric-trend-up">
+                            <i class="fas fa-calendar"></i> Last 30 days
                         </div>
                     </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon metric-icon-info">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3 class="metric-value" id="myApprovalRate">0%</h3>
+                        <p class="metric-label">My Approval Rate</p>
+                        <div class="metric-trend">
+                            <i class="fas fa-chart-line"></i> Overall
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Personal Performance Charts -->
+            <div class="charts-grid" style="margin-top: 2rem;">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-chart-pie text-pccr-gold"></i>
+                            My Applications by Status
+                        </h3>
+                        <p class="chart-subtitle">Your assigned applications</p>
+                    </div>
+                    <div id="myStatusChart" style="height: 300px;"></div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-chart-bar text-pccr-gold"></i>
+                            My Activity (Last 7 Days)
+                        </h3>
+                        <p class="chart-subtitle">Applications processed daily</p>
+                    </div>
+                    <div id="myActivityChart" style="height: 300px;"></div>
                 </div>
             </div>
         </section>
@@ -193,9 +232,9 @@
                             <span class="icon-wrapper">
                                 <i class="fas fa-file-alt"></i>
                             </span>
-                            Student Applications
+                            My Assigned Applications
                         </h2>
-                        <p class="section-description">View and manage all student application records</p>
+                        <p class="section-description">View and manage applications assigned to you</p>
                     </div>
                     <div class="section-actions">
                         <div class="search-wrapper">
@@ -220,13 +259,12 @@
                                 <th>Program</th>
                                 <th>Applied Date</th>
                                 <th>Status</th>
-                                <th id="assignedHeader" style="display: none;">Assigned To</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="applicationsTableBody">
                             <tr>
-                                <td colspan="7" class="loading-cell">
+                                <td colspan="6" class="loading-cell">
                                     <div class="table-loader">
                                         <div class="loader"></div>
                                         <p>Loading applications...</p>
@@ -252,10 +290,78 @@
         
         <!-- Reports Section -->
         <section id="reportsSection" class="dashboard-section">
-            <div class="section-placeholder">
-                <i class="fas fa-chart-bar"></i>
-                <h2>Reports</h2>
-                <p>Coming soon! Analytics and reports will be available here.</p>
+            <div class="reports-header">
+                <h2 class="section-title">
+                    <span class="icon-wrapper">
+                        <i class="fas fa-chart-line"></i>
+                    </span>
+                    My Performance Reports
+                </h2>
+                <p class="section-description">Track your work and performance metrics</p>
+            </div>
+            
+            <!-- Personal Analytics -->
+            <div class="charts-grid">
+                <!-- My Processing Performance -->
+                <div class="chart-card chart-card-wide">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-chart-area text-pccr-gold"></i>
+                            My Processing Timeline (30 Days)
+                        </h3>
+                        <p class="chart-subtitle">Applications I've approved or rejected over time</p>
+                    </div>
+                    <div id="myProcessingTimelineChart" style="height: 350px;"></div>
+                </div>
+                
+                <!-- My Program Breakdown -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-graduation-cap text-pccr-gold"></i>
+                            My Applications by Program
+                        </h3>
+                        <p class="chart-subtitle">Programs you're handling</p>
+                    </div>
+                    <div id="myProgramChart" style="height: 350px;"></div>
+                </div>
+                
+                <!-- My Weekly Performance -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-calendar-week text-pccr-gold"></i>
+                            Weekly Activity
+                        </h3>
+                        <p class="chart-subtitle">Last 4 weeks comparison</p>
+                    </div>
+                    <div id="myWeeklyChart" style="height: 350px;"></div>
+                </div>
+            </div>
+            
+            <!-- Personal Statistics -->
+            <div class="stats-table-section">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="fas fa-trophy text-pccr-gold"></i>
+                        My Performance Summary
+                    </h3>
+                    <p class="chart-subtitle">Your work statistics</p>
+                </div>
+                <div class="stats-table-container">
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="myStatsTableBody">
+                            <tr><td colspan="3" style="text-align: center; padding: 2rem;">Loading your statistics...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
         
@@ -271,46 +377,6 @@
         </main>
     </div>
 
-    <!-- Assignment Modal (For Admission Head Only) -->
-    <div id="assignmentModal" class="modal">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <div>
-                    <h3 class="modal-title">Assign Application</h3>
-                    <p class="modal-subtitle">Select a staff member for this application</p>
-                </div>
-                <button class="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">
-                        <i class="fas fa-user-tie text-pccr-gold mr-2"></i>
-                        Staff Member
-                    </label>
-                    <select id="staffSelect" class="form-select">
-                        <option value="">Select Staff Member...</option>
-                    </select>
-                    <small class="form-hint">
-                        <i class="fas fa-info-circle text-pccr-gold"></i>
-                        The selected staff will be notified of the assignment
-                    </small>
-                </div>
-                <input type="hidden" id="selectedApplicationId">
-            </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" id="modalCancelBtn">
-                    <i class="fas fa-times mr-2"></i> Cancel
-                </button>
-                <button class="btn-primary" id="modalAssignBtn">
-                    <i class="fas fa-check mr-2"></i> Assign
-                </button>
-            </div>
-        </div>
-    </div>
-    
     <!-- View Application Modal -->
 <div id="viewModal" class="modal">
     <div class="modal-overlay"></div>
@@ -577,6 +643,9 @@
     
     <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     
     <!-- Custom Script -->
     <script src="script.js"></script>

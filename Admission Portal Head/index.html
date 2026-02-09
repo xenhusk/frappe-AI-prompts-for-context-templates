@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PCCR - Admission Portal</title>
+    <title>PCCR - Admission Head Control Panel</title>
     <link rel="icon" href="https://cutover.pccr.edu.ph/files/pccr-logo.png">
     
     <!-- Tailwind CSS CDN -->
@@ -101,7 +101,7 @@
                     </div>
                     <div class="user-info">
                         <p class="user-name" id="userName">Loading...</p>
-                        <p class="user-role" id="userRole">Loading...</p>
+                        <p class="user-role" id="userRole">Admission Head</p>
                     </div>
                 </div>
             </div>
@@ -124,7 +124,7 @@
                     
                     <div class="relative z-10 header-content">
                         <div>
-                            <h1 id="dashboardTitle" class="dashboard-title">Loading Dashboard...</h1>
+                            <h1 id="dashboardTitle" class="dashboard-title">Admission Head Control Panel</h1>
                             <p class="dashboard-subtitle">Welcome back! Here's what's happening today.</p>
                         </div>
                         <div class="header-actions">
@@ -142,6 +142,7 @@
             
         <!-- Overview Section -->
         <section id="overviewSection" class="dashboard-section active">
+            <!-- Metrics Cards -->
             <div class="metrics-section">
                 <div class="metric-card">
                     <div class="metric-icon metric-icon-primary">
@@ -150,8 +151,8 @@
                     <div class="metric-content">
                         <h3 class="metric-value" id="totalApplications">0</h3>
                         <p class="metric-label">Total Applications</p>
-                        <div class="metric-trend metric-trend-up">
-                            <i class="fas fa-arrow-up"></i> 12% from last month
+                        <div class="metric-trend" id="totalTrend">
+                            <i class="fas fa-minus"></i> <span id="totalTrendText">No change</span>
                         </div>
                     </div>
                 </div>
@@ -163,8 +164,8 @@
                     <div class="metric-content">
                         <h3 class="metric-value" id="pendingReview">0</h3>
                         <p class="metric-label">Pending Review</p>
-                        <div class="metric-trend metric-trend-down">
-                            <i class="fas fa-arrow-down"></i> 8% from last week
+                        <div class="metric-trend" id="pendingTrend">
+                            <i class="fas fa-minus"></i> <span id="pendingTrendText">No change</span>
                         </div>
                     </div>
                 </div>
@@ -175,11 +176,75 @@
                     </div>
                     <div class="metric-content">
                         <h3 class="metric-value" id="myAssignments">0</h3>
-                        <p class="metric-label">My Assignments</p>
+                        <p class="metric-label">Unassigned</p>
                         <div class="metric-trend">
-                            <i class="fas fa-minus"></i> No change
+                            <i class="fas fa-info-circle"></i> Need assignment
                         </div>
                     </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon metric-icon-success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3 class="metric-value" id="approvedCount">0</h3>
+                        <p class="metric-label">Approved (30d)</p>
+                        <div class="metric-trend metric-trend-up">
+                            <i class="fas fa-arrow-up"></i> Last 30 days
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon metric-icon-danger">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3 class="metric-value" id="rejectedCount">0</h3>
+                        <p class="metric-label">Rejected (30d)</p>
+                        <div class="metric-trend metric-trend-down">
+                            <i class="fas fa-arrow-down"></i> Last 30 days
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon metric-icon-info">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3 class="metric-value" id="approvalRate">0%</h3>
+                        <p class="metric-label">Approval Rate</p>
+                        <div class="metric-trend">
+                            <i class="fas fa-chart-line"></i> Overall
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Charts Overview -->
+            <div class="charts-grid" style="margin-top: 2rem;">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-chart-pie text-pccr-gold"></i>
+                            Status Distribution
+                        </h3>
+                        <p class="chart-subtitle">Current status breakdown</p>
+                    </div>
+                    <div id="statusDistributionChart" style="height: 300px;"></div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-chart-line text-pccr-gold"></i>
+                            Applications Trend (30 Days)
+                        </h3>
+                        <p class="chart-subtitle">Daily application submissions</p>
+                    </div>
+                    <div id="trendChart" style="height: 300px;"></div>
                 </div>
             </div>
         </section>
@@ -220,7 +285,7 @@
                                 <th>Program</th>
                                 <th>Applied Date</th>
                                 <th>Status</th>
-                                <th id="assignedHeader" style="display: none;">Assigned To</th>
+                                <th id="assignedHeader">Assigned To</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -252,10 +317,112 @@
         
         <!-- Reports Section -->
         <section id="reportsSection" class="dashboard-section">
-            <div class="section-placeholder">
-                <i class="fas fa-chart-bar"></i>
-                <h2>Reports</h2>
-                <p>Coming soon! Analytics and reports will be available here.</p>
+            <div class="reports-header">
+                <h2 class="section-title">
+                    <span class="icon-wrapper">
+                        <i class="fas fa-chart-bar"></i>
+                    </span>
+                    Analytics & Reports
+                </h2>
+                <p class="section-description">Comprehensive admission insights and performance metrics</p>
+            </div>
+            
+            <!-- Detailed Analytics Grid -->
+            <div class="charts-grid">
+                <!-- Row 1: Status & Program Analysis -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-clipboard-list text-pccr-gold"></i>
+                            Applications by Program
+                        </h3>
+                        <p class="chart-subtitle">Distribution across programs</p>
+                    </div>
+                    <div id="programDistributionChart" style="height: 350px;"></div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-users text-pccr-gold"></i>
+                            Applications by Category
+                        </h3>
+                        <p class="chart-subtitle">New, Transferee, Second Courser</p>
+                    </div>
+                    <div id="categoryDistributionChart" style="height: 350px;"></div>
+                </div>
+                
+                <!-- Row 2: Staff Performance -->
+                <div class="chart-card chart-card-wide">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-user-tie text-pccr-gold"></i>
+                            Staff Performance Overview
+                        </h3>
+                        <p class="chart-subtitle">Applications assigned and processed by staff</p>
+                    </div>
+                    <div id="staffPerformanceChart" style="height: 350px;"></div>
+                </div>
+                
+                <!-- Row 3: Time-based Analysis -->
+                <div class="chart-card chart-card-wide">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-calendar-alt text-pccr-gold"></i>
+                            30-Day Application Trend
+                        </h3>
+                        <p class="chart-subtitle">Daily submissions and processing</p>
+                    </div>
+                    <div id="detailedTrendChart" style="height: 350px;"></div>
+                </div>
+                
+                <!-- Row 4: Processing Metrics -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-hourglass-half text-pccr-gold"></i>
+                            Processing Status
+                        </h3>
+                        <p class="chart-subtitle">Current application states</p>
+                    </div>
+                    <div id="processingStatusChart" style="height: 350px;"></div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-chart-area text-pccr-gold"></i>
+                            Weekly Comparison
+                        </h3>
+                        <p class="chart-subtitle">Last 4 weeks activity</p>
+                    </div>
+                    <div id="weeklyComparisonChart" style="height: 350px;"></div>
+                </div>
+            </div>
+            
+            <!-- Summary Statistics Table -->
+            <div class="stats-table-section">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="fas fa-table text-pccr-gold"></i>
+                        Detailed Statistics
+                    </h3>
+                    <p class="chart-subtitle">Comprehensive breakdown</p>
+                </div>
+                <div class="stats-table-container">
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                                <th>30d Change</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statsTableBody">
+                            <tr><td colspan="3" style="text-align: center; padding: 2rem;">Loading statistics...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
         
@@ -577,6 +744,9 @@
     
     <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     
     <!-- Custom Script -->
     <script src="script.js"></script>

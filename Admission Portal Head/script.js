@@ -1,18 +1,10 @@
 // ========================================
-// PCCR Admission Portal - JavaScript Logic
-// UPDATED: Strict Role-Based Access Control (RBAC)
-// ========================================
-// 
-// RBAC Rules:
-// 1. isHead = true ONLY for "Admission Head" OR "System Manager" roles
-// 2. Staff users ONLY fetch data assigned to them (strict filtering)
-// 3. Staff users see "Admission Staff Workspace" title
-// 4. Staff users cannot see "Assigned To" column or "Assign" button
-// 5. Staff users can only approve/reject applications assigned to them
+// PCCR Admission Portal - ADMISSION HEAD
+// For users with "Admission Head" role
 // ========================================
 
 // === GLOBAL VARIABLES ===
-let isHead = false; // Default to Staff for security (RBAC Rule #1)
+const isHead = true; // HARDCODED for Admission Head portal
 let currentUserEmail = '';
 let currentPage = 1;
 let totalPages = 1;
@@ -36,80 +28,10 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
 });
 
-// Frappe Ready
+// Frappe Ready - Simplified for Head portal
 if (typeof frappe !== 'undefined') {
     frappe.ready(function() {
         currentUserEmail = frappe.session.user;
-        
-        // Try multiple sources for user roles (in order of reliability)
-        let userRoles = [];
-        
-        // Method 1: Check frappe.boot.user.roles (most reliable)
-        if (frappe.boot && frappe.boot.user && frappe.boot.user.roles) {
-            userRoles = frappe.boot.user.roles;
-            console.log('✓ Roles from frappe.boot.user.roles:', userRoles);
-        }
-        // Method 2: Check frappe.user_roles
-        else if (frappe.user_roles && frappe.user_roles.length > 0) {
-            userRoles = frappe.user_roles;
-            console.log('✓ Roles from frappe.user_roles:', userRoles);
-        }
-        // Method 3: Check frappe.session.user_roles
-        else if (frappe.session && frappe.session.user_roles && frappe.session.user_roles.length > 0) {
-            userRoles = frappe.session.user_roles;
-            console.log('✓ Roles from frappe.session.user_roles:', userRoles);
-        }
-        // Method 4: Fetch from server using custom whitelisted API
-        else {
-            console.log('⚠ No roles found in session, fetching from server...');
-            frappe.call({
-                method: 'get_user_roles',
-                callback: function(r) {
-                    console.log('Server response:', r);
-                    if (r.message) {
-                        // Handle both array and object responses
-                        if (Array.isArray(r.message)) {
-                            userRoles = r.message;
-                        } else if (typeof r.message === 'object' && r.message.data) {
-                            userRoles = r.message.data;
-                        } else {
-                            userRoles = [];
-                        }
-                        frappe.user_roles = userRoles;
-                        console.log('✓ Roles fetched from custom API:', userRoles);
-                        initializeDashboard();
-                    } else {
-                        console.error('✗ Invalid response from server:', r);
-                        frappe.user_roles = [];
-                        initializeDashboard();
-                    }
-                },
-                error: function(err) {
-                    console.error('✗ Error calling custom API:', err);
-                    console.error('⚠ Server Script has an error!');
-                    console.log('%cServer Script Fix:', 'color: #fcb31c; font-size: 14px; font-weight: bold;');
-                    console.log('Replace your Server Script code with this EXACT code:');
-                    console.log('%c' + 
-                        'import frappe\n\n' +
-                        '# Get the current user\'s roles\n' +
-                        'user = frappe.session.user\n\n' +
-                        'if user == "Guest":\n' +
-                        '    frappe.response[\'message\'] = []\n' +
-                        'else:\n' +
-                        '    frappe.response[\'message\'] = frappe.get_roles(user)', 
-                        'background: #f0f0f0; padding: 10px; font-family: monospace;'
-                    );
-                    frappe.user_roles = [];
-                    initializeDashboard();
-                }
-            });
-            return; // Exit early, callback will handle initialization
-        }
-        
-        // Store roles globally
-        frappe.user_roles = userRoles;
-        
-        // Initialize dashboard with available role information
         initializeDashboard();
     });
 } else {
@@ -193,50 +115,20 @@ async function initializeDashboard() {
         return;
     }
 
-    // Check user role - compatible with all Frappe versions
-    // Try multiple sources for roles (in priority order)
-    let roles = [];
-    
-    if (frappe.user_roles && frappe.user_roles.length > 0) {
-        roles = frappe.user_roles;
-        console.log('✓ Using frappe.user_roles');
-    } else if (frappe.boot && frappe.boot.user && frappe.boot.user.roles && frappe.boot.user.roles.length > 0) {
-        roles = frappe.boot.user.roles;
-        console.log('✓ Using frappe.boot.user.roles');
-    } else if (frappe.session && frappe.session.user_roles && frappe.session.user_roles.length > 0) {
-        roles = frappe.session.user_roles;
-        console.log('✓ Using frappe.session.user_roles');
-    } else {
-        console.warn('⚠ No roles found in any source!');
-        console.log('Debug - frappe.user_roles:', frappe.user_roles);
-        console.log('Debug - frappe.boot:', frappe.boot);
-        console.log('Debug - frappe.session:', frappe.session);
-    }
-    
-    // Allow access if Admission Head OR System Manager
-    isHead = roles.includes("Admission Head") || roles.includes("System Manager"); 
+    // Set user info (Admission Head portal)
+    const userName = frappe.session.user_fullname || frappe.session.user || 'User';
     currentUserEmail = frappe.session.user;
     
-    console.log('User roles:', roles);
-    console.log('Is Head:', isHead);
-    
-    // Set user info
-    const userRole = isHead ? 'Admission Head' : 'Admission Staff';
-    const title = isHead ? 'Admission Head Control Panel' : 'Admission Staff Workspace';
-    const userName = frappe.session.user_fullname || frappe.session.user || 'User';
-    
     document.getElementById('userName').textContent = userName;
-    document.getElementById('userRole').textContent = userRole;
-    document.getElementById('dashboardTitle').textContent = title;
+    document.getElementById('userRole').textContent = 'Admission Head';
+    document.getElementById('dashboardTitle').textContent = 'Admission Head Control Panel';
     
-    // Show/hide assignment column for heads
-    if (isHead) {
-        const assignedHeader = document.getElementById('assignedHeader');
-        if (assignedHeader) {
-            assignedHeader.style.display = 'table-cell';
-        }
-        loadStaffMembers();
+    // Show assignment column and load staff (Head has full access)
+    const assignedHeader = document.getElementById('assignedHeader');
+    if (assignedHeader) {
+        assignedHeader.style.display = 'table-cell';
     }
+    loadStaffMembers();
     
     // Setup event listeners
     setupEventListeners();
@@ -449,15 +341,8 @@ async function loadDashboardData() {
     }
 
     try {
-        // ===== RBAC Rule #2: Restrict Data Loading =====
-        // Staff users can ONLY fetch applications assigned to them
-        let filters = {};
-        if (!isHead) {
-            filters = {
-                assigned_staff: frappe.session.user 
-            };
-        }
         // Heads fetch ALL applications (no filter)
+        let filters = {};
         
         // Fetch applications - UPDATED DOCTYPE NAME
         frappe.call({
@@ -476,8 +361,9 @@ async function loadDashboardData() {
                 if (r.message) {
                     applicationsData = r.message;
                     filteredData = [...applicationsData];
-                    updateMetrics();
+                    updateMetricsEnhanced();
                     renderTable();
+                    initializeCharts();
                 } else {
                     showEmptyState();
                 }
@@ -652,10 +538,10 @@ function renderTable() {
         return;
     }
     
-    // ===== RBAC Rule #4: Hide "Assigned To" column for Staff =====
+    // Show "Assigned To" column (Head always sees it)
     const assignedHeader = document.getElementById('assignedHeader');
     if (assignedHeader) {
-        assignedHeader.style.display = isHead ? 'table-cell' : 'none';
+        assignedHeader.style.display = 'table-cell';
     }
     
     let html = '';
@@ -675,17 +561,12 @@ function renderTable() {
         const date = formatDate(app.application_date || app.creation);
         const initial = (app.first_name?.[0] || 'S').toUpperCase();
         
-        // Determine colspan based on role
-        const colspan = isHead ? '7' : '6';
-        
-        // ===== RBAC Rule #4: Hide "Assign" button for Staff =====
-        const assignBtn = isHead ? 
-        `<button class="btn-action btn-assign" data-app-name="${app.name}">
+        // Head has full access - always show assign button and column
+        const assignBtn = `<button class="btn-action btn-assign" data-app-name="${app.name}">
             <i class="fas fa-user-plus"></i> Assign
-         </button>` : '';
+         </button>`;
 
-        const assignedColumn = isHead ? 
-            `<td>${app.assigned_staff || '<span class="text-muted">Unassigned</span>'}</td>` : '';
+        const assignedColumn = `<td>${app.assigned_staff || '<span class="text-muted">Unassigned</span>'}</td>`;
         
         html += `
                 <tr class="table-row">
@@ -724,12 +605,9 @@ function showEmptyState() {
     const tbody = document.getElementById('applicationsTableBody');
     if (!tbody) return;
     
-    // Determine colspan based on role
-    const colspan = isHead ? '7' : '6';
-    
     tbody.innerHTML = `
         <tr>
-            <td colspan="${colspan}" class="empty-state">
+            <td colspan="7" class="empty-state">
                 <i class="fas fa-inbox"></i>
                 <p>No applications found</p>
             </td>
@@ -786,9 +664,31 @@ function updatePagination() {
 
 // === ASSIGNMENT MODAL (HEAD ONLY) ===
 function loadStaffMembers() {
+    const select = document.getElementById('staffSelect');
+    
+    // TEMPORARY WORKAROUND: Manually list your staff members here
+    // Replace these with your actual staff email and names
+    const manualStaffList = [
+        // { name: 'staff.email@pccr.edu.ph', full_name: 'Staff Full Name' },
+        // Add more staff members as needed
+    ];
+    
+    // If manual list is provided and we're not in demo mode, use it
+    if (manualStaffList.length > 0 && typeof frappe !== 'undefined') {
+        console.log('Using manual staff list (temporary workaround)');
+        manualStaffList.forEach(user => {
+            const option = document.createElement('option');
+            option.value = user.name;
+            option.textContent = user.full_name;
+            option.setAttribute('data-fullname', user.full_name);
+            select.appendChild(option);
+        });
+        console.log(`✓ Loaded ${manualStaffList.length} staff members (manual)`);
+        return;
+    }
+    
     if (typeof frappe === 'undefined') {
         // Demo staff for testing
-        const select = document.getElementById('staffSelect');
         const demoStaff = [
             { name: 'staff1@pccr.edu.ph', full_name: 'Staff Member 1' },
             { name: 'staff2@pccr.edu.ph', full_name: 'Staff Member 2' },
@@ -805,86 +705,57 @@ function loadStaffMembers() {
         return;
     }
 
-    // Fetch users with Admission Staff role by filtering client-side
+    // Call server script to get users with Admission Staff role
+    // Server scripts run with elevated permissions, bypassing child table permission issues
+    console.log('Fetching Admission Staff members via server script...');
+    
     frappe.call({
-        method: 'frappe.client.get_list',
-        args: {
-            doctype: 'User',
-            fields: ['name', 'full_name', 'email'],
-            filters: {
-                enabled: 1,
-                user_type: 'System User'
-            },
-            limit_page_length: 999
-        },
-        callback: async function(r) {
+        method: 'get_admission_staff',
+        callback: function(r) {
+            console.log('Server script response:', r);
+            
             if (r.message && r.message.length > 0) {
                 const select = document.getElementById('staffSelect');
+                
                 // Clear existing options except the first one
                 while (select.options.length > 1) {
                     select.remove(1);
                 }
                 
-                const admissionStaff = [];
-                
-                // Check each user for Admission Staff role
-                const checkPromises = r.message.map(user => {
-                    return new Promise((resolve) => {
-                        frappe.call({
-                            method: 'frappe.client.get',
-                            args: {
-                                doctype: 'User',
-                                name: user.name
-                            },
-                            callback: function(user_detail) {
-                                if (user_detail.message && user_detail.message.roles) {
-                                    const hasAdmissionStaffRole = user_detail.message.roles.some(
-                                        role => role.role === 'Admission Staff'
-                                    );
-                                    
-                                    if (hasAdmissionStaffRole) {
-                                        admissionStaff.push({
-                                            name: user.name,
-                                            full_name: user.full_name || user.name
-                                        });
-                                    }
-                                }
-                                resolve();
-                            },
-                            error: function() {
-                                resolve();
-                            }
-                        });
-                    });
-                });
-                
-                // Wait for all checks to complete
-                await Promise.all(checkPromises);
-                
-                // Sort alphabetically
-                admissionStaff.sort((a, b) => a.full_name.localeCompare(b.full_name));
-                
-                // Add to dropdown
-                admissionStaff.forEach(user => {
+                // Add staff members to dropdown
+                r.message.forEach(user => {
                     const option = document.createElement('option');
                     option.value = user.name;
-                    option.textContent = user.full_name;
-                    option.setAttribute('data-fullname', user.full_name);
+                    option.textContent = user.full_name || user.name;
+                    option.setAttribute('data-fullname', user.full_name || user.name);
                     select.appendChild(option);
                 });
                 
-                console.log(`Loaded ${admissionStaff.length} Admission Staff members`);
+                console.log(`✓ Loaded ${r.message.length} Admission Staff members`);
+                showToast(`Loaded ${r.message.length} staff member(s)`, 'success');
                 
-                if (admissionStaff.length === 0) {
-                    showToast('No users found with "Admission Staff" role', 'warning');
-                }
             } else {
-                console.warn('No users found');
+                console.warn('No Admission Staff members found');
+                showToast('No users found with "Admission Staff" role. Please assign the role to users.', 'warning');
             }
         },
         error: function(err) {
             console.error('Error loading staff members:', err);
-            showToast('Failed to load staff members', 'error');
+            
+            // Provide helpful error messages
+            if (err && err.exc) {
+                const errorMessage = err.exc || '';
+                if (errorMessage.includes('not found')) {
+                    console.error('❌ Server Script "get_admission_staff" not found!');
+                    console.error('Please create the server script. See: get_admission_staff_server_script.py');
+                    showToast('Server Script not configured. Please create "get_admission_staff" server script.', 'error');
+                } else {
+                    console.error('Server script error:', errorMessage);
+                    showToast('Failed to load staff members. Check console for details.', 'error');
+                }
+            } else {
+                showToast('Failed to load staff members. Check console for details.', 'error');
+            }
         }
     });
 }
@@ -1069,6 +940,11 @@ function switchSection(sectionName) {
     if (targetSection) {
         targetSection.classList.add('active');
         targetSection.style.display = 'block';
+        
+        // Initialize reports charts when switching to reports section
+        if (sectionName === 'reports' && applicationsData.length > 0) {
+            setTimeout(() => renderReportsCharts(), 100);
+        }
     }
 }
 
@@ -1281,28 +1157,10 @@ function populateViewModal(data) {
     setViewField('view_creation', formatDateTime(data.creation));
     setViewField('view_modified', formatDateTime(data.modified));
     
-    // Show status update section for Admission Head
-    const statusUpdateSection = document.getElementById('viewStatusUpdate');
-    if (isHead && statusUpdateSection) {
-        statusUpdateSection.style.display = 'block';
-        document.getElementById('viewStatusSelect').value = data.application_status || 'PENDING';
-    }
-    
-    // ===== RBAC Rule #5: Hide Approve/Reject buttons based on role =====
-    // Staff can only approve/reject if application is assigned to them
+    // Admission Head can always approve/reject all applications
     const modalFooter = document.querySelector('#viewModal .modal-footer');
     if (modalFooter) {
-        if (isHead) {
-            // Admission Head can always approve/reject
-            modalFooter.style.display = 'flex';
-        } else {
-            // Staff can only approve/reject if assigned to them
-            if (data.assigned_staff === frappe.session.user) {
-                modalFooter.style.display = 'flex';
-            } else {
-                modalFooter.style.display = 'none';
-            }
-        }
+        modalFooter.style.display = 'flex';
     }
 }
 
@@ -1612,6 +1470,619 @@ function formatDateTime(dateString) {
 }
 
 
+// ========================================
+// CHARTS & ANALYTICS (ADMISSION HEAD)
+// ========================================
+
+let chartsInitialized = false;
+let chartInstances = {};
+
+// Initialize all charts
+function initializeCharts() {
+    if (chartsInitialized) return;
+    if (typeof ApexCharts === 'undefined') {
+        console.warn('ApexCharts not loaded');
+        return;
+    }
+    
+    renderStatusDistributionChart();
+    renderTrendChart();
+    chartsInitialized = true;
+}
+
+// Render detailed charts for Reports section
+function renderReportsCharts() {
+    if (typeof ApexCharts === 'undefined') return;
+    
+    renderProgramDistributionChart();
+    renderCategoryDistributionChart();
+    renderStaffPerformanceChart();
+    renderDetailedTrendChart();
+    renderProcessingStatusChart();
+    renderWeeklyComparisonChart();
+    renderStatsTable();
+}
+
+// === OVERVIEW CHARTS ===
+
+// Status Distribution (Donut Chart)
+function renderStatusDistributionChart() {
+    const pending = applicationsData.filter(app => app.application_status === 'PENDING').length;
+    const approved = applicationsData.filter(app => app.application_status === 'APPROVED').length;
+    const rejected = applicationsData.filter(app => app.application_status === 'REJECTED').length;
+    
+    const options = {
+        series: [pending, approved, rejected],
+        chart: {
+            type: 'donut',
+            height: 300,
+            fontFamily: 'Inter, sans-serif'
+        },
+        labels: ['Pending', 'Approved', 'Rejected'],
+        colors: ['#fcb31c', '#10b981', '#ef4444'],
+        legend: {
+            position: 'bottom',
+            fontSize: '14px'
+        },
+        dataLabels: {
+            enabled: true,
+            formatter: function(val, opts) {
+                return opts.w.config.series[opts.seriesIndex];
+            }
+        },
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '70%',
+                    labels: {
+                        show: true,
+                        total: {
+                            show: true,
+                            label: 'Total',
+                            fontSize: '16px',
+                            fontWeight: 600,
+                            color: '#1f2937'
+                        }
+                    }
+                }
+            }
+        }
+    };
+    
+    if (chartInstances.statusDist) {
+        chartInstances.statusDist.destroy();
+    }
+    
+    const chart = new ApexCharts(document.querySelector("#statusDistributionChart"), options);
+    chart.render();
+    chartInstances.statusDist = chart;
+}
+
+// Applications Trend (Line Chart - Last 30 Days)
+function renderTrendChart() {
+    const last30Days = getLast30Days();
+    const trendData = calculateDailyTrend(last30Days);
+    
+    const options = {
+        series: [{
+            name: 'Applications',
+            data: trendData.counts
+        }],
+        chart: {
+            type: 'area',
+            height: 300,
+            fontFamily: 'Inter, sans-serif',
+            toolbar: {
+                show: false
+            }
+        },
+        xaxis: {
+            categories: trendData.dates,
+            labels: {
+                rotate: -45,
+                style: {
+                    fontSize: '11px'
+                }
+            }
+        },
+        yaxis: {
+            title: {
+                text: 'Applications'
+            }
+        },
+        colors: ['#7b0200'],
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.7,
+                opacityTo: 0.3,
+                stops: [0, 90, 100]
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            curve: 'smooth',
+            width: 3
+        },
+        grid: {
+            borderColor: '#f3f4f6'
+        }
+    };
+    
+    if (chartInstances.trend) {
+        chartInstances.trend.destroy();
+    }
+    
+    const chart = new ApexCharts(document.querySelector("#trendChart"), options);
+    chart.render();
+    chartInstances.trend = chart;
+}
+
+// === REPORTS SECTION CHARTS ===
+
+// Program Distribution
+function renderProgramDistributionChart() {
+    const programCounts = {};
+    applicationsData.forEach(app => {
+        const program = app.program || 'Not Specified';
+        programCounts[program] = (programCounts[program] || 0) + 1;
+    });
+    
+    const options = {
+        series: [{
+            data: Object.values(programCounts)
+        }],
+        chart: {
+            type: 'bar',
+            height: 350,
+            fontFamily: 'Inter, sans-serif'
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 8,
+                horizontal: true,
+                distributed: true
+            }
+        },
+        colors: ['#7b0200', '#fcb31c', '#10b981', '#3b82f6', '#8b5cf6'],
+        xaxis: {
+            categories: Object.keys(programCounts)
+        },
+        dataLabels: {
+            enabled: true
+        },
+        legend: {
+            show: false
+        }
+    };
+    
+    if (chartInstances.program) {
+        chartInstances.program.destroy();
+    }
+    
+    const chart = new ApexCharts(document.querySelector("#programDistributionChart"), options);
+    chart.render();
+    chartInstances.program = chart;
+}
+
+// Category Distribution
+function renderCategoryDistributionChart() {
+    const categoryCounts = {};
+    applicationsData.forEach(app => {
+        const category = app.student_category || 'Not Specified';
+        categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+    });
+    
+    const options = {
+        series: Object.values(categoryCounts),
+        chart: {
+            type: 'pie',
+            height: 350,
+            fontFamily: 'Inter, sans-serif'
+        },
+        labels: Object.keys(categoryCounts),
+        colors: ['#7b0200', '#fcb31c', '#10b981', '#3b82f6'],
+        legend: {
+            position: 'bottom'
+        }
+    };
+    
+    if (chartInstances.category) {
+        chartInstances.category.destroy();
+    }
+    
+    const chart = new ApexCharts(document.querySelector("#categoryDistributionChart"), options);
+    chart.render();
+    chartInstances.category = chart;
+}
+
+// Staff Performance
+function renderStaffPerformanceChart() {
+    const staffStats = {};
+    applicationsData.forEach(app => {
+        if (app.assigned_staff) {
+            if (!staffStats[app.assigned_staff]) {
+                staffStats[app.assigned_staff] = {
+                    total: 0,
+                    approved: 0,
+                    rejected: 0,
+                    pending: 0
+                };
+            }
+            staffStats[app.assigned_staff].total++;
+            if (app.application_status === 'APPROVED') staffStats[app.assigned_staff].approved++;
+            if (app.application_status === 'REJECTED') staffStats[app.assigned_staff].rejected++;
+            if (app.application_status === 'PENDING') staffStats[app.assigned_staff].pending++;
+        }
+    });
+    
+    const staffNames = Object.keys(staffStats);
+    const approvedData = staffNames.map(name => staffStats[name].approved);
+    const rejectedData = staffNames.map(name => staffStats[name].rejected);
+    const pendingData = staffNames.map(name => staffStats[name].pending);
+    
+    const options = {
+        series: [{
+            name: 'Approved',
+            data: approvedData
+        }, {
+            name: 'Rejected',
+            data: rejectedData
+        }, {
+            name: 'Pending',
+            data: pendingData
+        }],
+        chart: {
+            type: 'bar',
+            height: 350,
+            stacked: true,
+            fontFamily: 'Inter, sans-serif'
+        },
+        colors: ['#10b981', '#ef4444', '#fcb31c'],
+        xaxis: {
+            categories: staffNames.map(email => email.split('@')[0])
+        },
+        yaxis: {
+            title: {
+                text: 'Applications'
+            }
+        },
+        legend: {
+            position: 'top'
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 6
+            }
+        }
+    };
+    
+    if (chartInstances.staffPerf) {
+        chartInstances.staffPerf.destroy();
+    }
+    
+    const chart = new ApexCharts(document.querySelector("#staffPerformanceChart"), options);
+    chart.render();
+    chartInstances.staffPerf = chart;
+}
+
+// Detailed Trend Chart
+function renderDetailedTrendChart() {
+    const last30Days = getLast30Days();
+    const trendData = calculateStatusTrend(last30Days);
+    
+    const options = {
+        series: [{
+            name: 'Submitted',
+            data: trendData.submitted
+        }, {
+            name: 'Approved',
+            data: trendData.approved
+        }, {
+            name: 'Rejected',
+            data: trendData.rejected
+        }],
+        chart: {
+            type: 'line',
+            height: 350,
+            fontFamily: 'Inter, sans-serif',
+            toolbar: {
+                show: true
+            }
+        },
+        colors: ['#7b0200', '#10b981', '#ef4444'],
+        xaxis: {
+            categories: trendData.dates,
+            labels: {
+                rotate: -45
+            }
+        },
+        yaxis: {
+            title: {
+                text: 'Count'
+            }
+        },
+        stroke: {
+            curve: 'smooth',
+            width: 3
+        },
+        markers: {
+            size: 4
+        },
+        legend: {
+            position: 'top'
+        },
+        grid: {
+            borderColor: '#f3f4f6'
+        }
+    };
+    
+    if (chartInstances.detailedTrend) {
+        chartInstances.detailedTrend.destroy();
+    }
+    
+    const chart = new ApexCharts(document.querySelector("#detailedTrendChart"), options);
+    chart.render();
+    chartInstances.detailedTrend = chart;
+}
+
+// Processing Status (Radial Bar)
+function renderProcessingStatusChart() {
+    const total = applicationsData.length;
+    const processed = applicationsData.filter(app => 
+        app.application_status === 'APPROVED' || app.application_status === 'REJECTED'
+    ).length;
+    const percentage = total > 0 ? Math.round((processed / total) * 100) : 0;
+    
+    const options = {
+        series: [percentage],
+        chart: {
+            type: 'radialBar',
+            height: 350,
+            fontFamily: 'Inter, sans-serif'
+        },
+        plotOptions: {
+            radialBar: {
+                hollow: {
+                    size: '65%'
+                },
+                dataLabels: {
+                    show: true,
+                    name: {
+                        show: true,
+                        fontSize: '16px',
+                        fontWeight: 600,
+                        offsetY: -10
+                    },
+                    value: {
+                        show: true,
+                        fontSize: '32px',
+                        fontWeight: 700,
+                        color: '#7b0200',
+                        offsetY: 5,
+                        formatter: function(val) {
+                            return val + '%';
+                        }
+                    },
+                    total: {
+                        show: true,
+                        label: 'Processed',
+                        fontSize: '14px',
+                        color: '#6b7280'
+                    }
+                }
+            }
+        },
+        colors: ['#7b0200'],
+        labels: ['Processing Rate']
+    };
+    
+    if (chartInstances.processing) {
+        chartInstances.processing.destroy();
+    }
+    
+    const chart = new ApexCharts(document.querySelector("#processingStatusChart"), options);
+    chart.render();
+    chartInstances.processing = chart;
+}
+
+// Weekly Comparison
+function renderWeeklyComparisonChart() {
+    const weeklyData = calculateWeeklyData();
+    
+    const options = {
+        series: [{
+            name: 'Applications',
+            data: weeklyData.counts
+        }],
+        chart: {
+            type: 'bar',
+            height: 350,
+            fontFamily: 'Inter, sans-serif'
+        },
+        colors: ['#7b0200'],
+        xaxis: {
+            categories: weeklyData.weeks
+        },
+        yaxis: {
+            title: {
+                text: 'Applications'
+            }
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 8,
+                columnWidth: '60%'
+            }
+        },
+        dataLabels: {
+            enabled: true
+        },
+        grid: {
+            borderColor: '#f3f4f6'
+        }
+    };
+    
+    if (chartInstances.weekly) {
+        chartInstances.weekly.destroy();
+    }
+    
+    const chart = new ApexCharts(document.querySelector("#weeklyComparisonChart"), options);
+    chart.render();
+    chartInstances.weekly = chart;
+}
+
+// === DATA CALCULATION HELPERS ===
+
+function getLast30Days() {
+    const days = [];
+    const today = new Date();
+    for (let i = 29; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        days.push(date);
+    }
+    return days;
+}
+
+function calculateDailyTrend(days) {
+    const dates = days.map(d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    const counts = days.map(day => {
+        return applicationsData.filter(app => {
+            const appDate = new Date(app.creation);
+            return appDate.toDateString() === day.toDateString();
+        }).length;
+    });
+    
+    return { dates, counts };
+}
+
+function calculateStatusTrend(days) {
+    const dates = days.map(d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    const submitted = [];
+    const approved = [];
+    const rejected = [];
+    
+    days.forEach(day => {
+        const dayStr = day.toDateString();
+        submitted.push(applicationsData.filter(app => 
+            new Date(app.creation).toDateString() === dayStr
+        ).length);
+        approved.push(applicationsData.filter(app => 
+            app.application_status === 'APPROVED' && new Date(app.modified).toDateString() === dayStr
+        ).length);
+        rejected.push(applicationsData.filter(app => 
+            app.application_status === 'REJECTED' && new Date(app.modified).toDateString() === dayStr
+        ).length);
+    });
+    
+    return { dates, submitted, approved, rejected };
+}
+
+function calculateWeeklyData() {
+    const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+    const counts = [];
+    const today = new Date();
+    
+    for (let i = 0; i < 4; i++) {
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - (i + 1) * 7);
+        const weekEnd = new Date(today);
+        weekEnd.setDate(today.getDate() - i * 7);
+        
+        const count = applicationsData.filter(app => {
+            const appDate = new Date(app.creation);
+            return appDate >= weekStart && appDate < weekEnd;
+        }).length;
+        
+        counts.unshift(count);
+    }
+    
+    return { weeks, counts };
+}
+
+// Statistics Table
+function renderStatsTable() {
+    const tbody = document.getElementById('statsTableBody');
+    if (!tbody) return;
+    
+    const total = applicationsData.length;
+    const pending = applicationsData.filter(app => app.application_status === 'PENDING').length;
+    const approved = applicationsData.filter(app => app.application_status === 'APPROVED').length;
+    const rejected = applicationsData.filter(app => app.application_status === 'REJECTED').length;
+    const unassigned = applicationsData.filter(app => !app.assigned_staff || app.assigned_staff === '').length;
+    const approvalRate = total > 0 ? ((approved / (approved + rejected)) * 100).toFixed(1) : 0;
+    
+    // Calculate 30-day changes
+    const last30 = applicationsData.filter(app => {
+        const appDate = new Date(app.creation);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        return appDate >= thirtyDaysAgo;
+    });
+    
+    const stats = [
+        { metric: 'Total Applications', value: total, change: `+${last30.length} (30d)` },
+        { metric: 'Pending Review', value: pending, change: `${((pending/total)*100).toFixed(1)}%` },
+        { metric: 'Approved', value: approved, change: `${((approved/total)*100).toFixed(1)}%` },
+        { metric: 'Rejected', value: rejected, change: `${((rejected/total)*100).toFixed(1)}%` },
+        { metric: 'Unassigned', value: unassigned, change: unassigned > 0 ? '⚠ Action needed' : '✓ All assigned' },
+        { metric: 'Approval Rate', value: `${approvalRate}%`, change: approved > rejected ? '✓ Positive' : '⚠ Review' }
+    ];
+    
+    let html = '';
+    stats.forEach(stat => {
+        html += `
+            <tr>
+                <td style="font-weight: 600;">${stat.metric}</td>
+                <td style="font-size: 1.125rem; font-weight: 700; color: #7b0200;">${stat.value}</td>
+                <td style="color: #6b7280;">${stat.change}</td>
+            </tr>
+        `;
+    });
+    
+    tbody.innerHTML = html;
+}
+
+// === UPDATE METRICS WITH ENHANCED DATA ===
+function updateMetricsEnhanced() {
+    const total = applicationsData.length;
+    const pending = applicationsData.filter(app => app.application_status === 'PENDING' || !app.application_status).length;
+    const unassigned = applicationsData.filter(app => !app.assigned_staff || app.assigned_staff === '').length;
+    
+    // Last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const approved30d = applicationsData.filter(app => 
+        app.application_status === 'APPROVED' && new Date(app.modified) >= thirtyDaysAgo
+    ).length;
+    
+    const rejected30d = applicationsData.filter(app => 
+        app.application_status === 'REJECTED' && new Date(app.modified) >= thirtyDaysAgo
+    ).length;
+    
+    const approvedTotal = applicationsData.filter(app => app.application_status === 'APPROVED').length;
+    const rejectedTotal = applicationsData.filter(app => app.application_status === 'REJECTED').length;
+    const approvalRate = (approvedTotal + rejectedTotal) > 0 ? 
+        Math.round((approvedTotal / (approvedTotal + rejectedTotal)) * 100) : 0;
+    
+    // Update counters
+    animateCounter('totalApplications', total);
+    animateCounter('pendingReview', pending);
+    animateCounter('myAssignments', unassigned);
+    animateCounter('approvedCount', approved30d);
+    animateCounter('rejectedCount', rejected30d);
+    
+    const approvalRateEl = document.getElementById('approvalRate');
+    if (approvalRateEl) {
+        approvalRateEl.textContent = approvalRate + '%';
+    }
+}
+
 // === EXPOSE FUNCTIONS TO WINDOW ===
 window.viewApplication = viewApplication;
 window.openAssignmentModal = openAssignmentModal;
@@ -1619,8 +2090,10 @@ window.closeAssignmentModal = closeAssignmentModal;
 window.confirmAssignment = confirmAssignment;
 window.refreshDashboard = refreshDashboard;
 window.showNotifications = showNotifications;
+window.switchViewTab = switchViewTab;
+window.printApplication = printApplication;
 
 // === CONSOLE MESSAGE ===
-console.log('%c🎓 PCCR Admission Portal', 'color: #7b0200; font-size: 20px; font-weight: bold;');
+console.log('%c🎓 PCCR Admission Portal - HEAD', 'color: #7b0200; font-size: 20px; font-weight: bold;');
 console.log('%cPro Bono Publico et Patria', 'color: #fcb31c; font-style: italic;');
 console.log('%cUsing DocType: ' + DOCTYPE_NAME, 'color: #666; font-size: 12px;');

@@ -1,0 +1,271 @@
+<!-- View Application Modal -->
+<div id="viewModal" class="modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content view-modal-content">
+        <div class="modal-header">
+            <div>
+                <h3 class="modal-title">
+                    <i class="fas fa-file-alt text-pccr-gold mr-2"></i>
+                    Application Details
+                </h3>
+                <p class="modal-subtitle" id="viewModalSubtitle">Student Application #000</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button class="modal-action-btn" onclick="printApplication()" title="Print">
+                    <i class="fas fa-print"></i>
+                </button>
+                <button class="modal-close" id="viewModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Tabs Navigation -->
+        <div class="view-modal-tabs">
+            <button class="view-tab active" data-tab="admission" onclick="switchViewTab('admission')">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Admission</span>
+            </button>
+            <button class="view-tab" data-tab="personal" onclick="switchViewTab('personal')">
+                <i class="fas fa-user"></i>
+                <span>Personal</span>
+            </button>
+            <button class="view-tab" data-tab="guardian" onclick="switchViewTab('guardian')">
+                <i class="fas fa-users"></i>
+                <span>Guardian & Address</span>
+            </button>
+            <button class="view-tab" data-tab="status" onclick="switchViewTab('status')">
+                <i class="fas fa-info-circle"></i>
+                <span>Status</span>
+            </button>
+        </div>
+        
+        <div class="modal-body view-modal-body">
+            
+            <!-- Tab 1: Admission Details -->
+            <div id="admissionTab" class="view-tab-content active">
+                <div class="view-section">
+                    <h4 class="view-section-title">
+                        <i class="fas fa-graduation-cap text-pccr-gold"></i>
+                        Admission Information
+                    </h4>
+                    <div class="view-grid">
+                        <div class="view-field">
+                            <label>Application ID</label>
+                            <span id="view_name">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Application Date</label>
+                            <span id="view_application_date">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Student Category</label>
+                            <span id="view_student_category">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Program Applied For</label>
+                            <span id="view_program">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Academic Year</label>
+                            <span id="view_academic_year">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Academic Term</label>
+                            <span id="view_academic_term">-</span>
+                        </div>
+                        <div class="view-field full-width">
+                            <label>Agent/Referrer</label>
+                            <span id="view_agent">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab 2: Personal Information -->
+            <div id="personalTab" class="view-tab-content">
+                <div class="view-section">
+                    <h4 class="view-section-title">
+                        <i class="fas fa-id-card text-pccr-gold"></i>
+                        Personal Details
+                    </h4>
+                    <div class="view-grid">
+                        <div class="view-field">
+                            <label>First Name</label>
+                            <span id="view_first_name">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Middle Name</label>
+                            <span id="view_middle_name">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Last Name</label>
+                            <span id="view_last_name">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Date of Birth</label>
+                            <span id="view_date_of_birth">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Gender</label>
+                            <span id="view_gender">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Blood Group</label>
+                            <span id="view_blood_group">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Nationality</label>
+                            <span id="view_nationality">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Religion</label>
+                            <span id="view_religion">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Mother Tongue</label>
+                            <span id="view_mother_tongue">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="view-section">
+                    <h4 class="view-section-title">
+                        <i class="fas fa-phone text-pccr-gold"></i>
+                        Contact Information
+                    </h4>
+                    <div class="view-grid">
+                        <div class="view-field">
+                            <label>Email Address</label>
+                            <span id="view_student_email_id">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Mobile Number</label>
+                            <span id="view_student_mobile_number">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Home Phone</label>
+                            <span id="view_home_phone_number">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab 3: Guardian & Address -->
+            <div id="guardianTab" class="view-tab-content">
+                <div class="view-section">
+                    <h4 class="view-section-title">
+                        <i class="fas fa-home text-pccr-gold"></i>
+                        Home Address
+                    </h4>
+                    <div class="view-grid">
+                        <div class="view-field full-width">
+                            <label>Address Line 1</label>
+                            <span id="view_address_line_1">-</span>
+                        </div>
+                        <div class="view-field full-width">
+                            <label>Address Line 2</label>
+                            <span id="view_address_line_2">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Barangay</label>
+                            <span id="view_barangay">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>City</label>
+                            <span id="view_city">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Province</label>
+                            <span id="view_province">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>State</label>
+                            <span id="view_state">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Pincode</label>
+                            <span id="view_pincode">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="view-section">
+                    <h4 class="view-section-title">
+                        <i class="fas fa-user-friends text-pccr-gold"></i>
+                        Guardian Details
+                    </h4>
+                    <div id="view_guardians_list" class="view-table-container">
+                        <p class="text-gray-500 text-sm italic">No guardian information available</p>
+                    </div>
+                </div>
+                
+                <div class="view-section">
+                    <h4 class="view-section-title">
+                        <i class="fas fa-child text-pccr-gold"></i>
+                        Sibling Details
+                    </h4>
+                    <div id="view_siblings_list" class="view-table-container">
+                        <p class="text-gray-500 text-sm italic">No sibling information available</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab 4: Status & Assignment -->
+            <div id="statusTab" class="view-tab-content">
+                <div class="view-section">
+                    <h4 class="view-section-title">
+                        <i class="fas fa-tasks text-pccr-gold"></i>
+                        Application Status
+                    </h4>
+                    <div class="view-grid">
+                        <div class="view-field">
+                            <label>Current Status</label>
+                            <span id="view_application_status">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Assigned To</label>
+                            <span id="view_assigned_staff">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Created Date</label>
+                            <span id="view_creation">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Last Modified</label>
+                            <span id="view_modified">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Status Update (For Admission Head Only) -->
+                <div id="viewStatusUpdate" class="view-section" style="display: none;">
+                    <h4 class="view-section-title">
+                        <i class="fas fa-edit text-pccr-gold"></i>
+                        Update Status
+                    </h4>
+                    <div class="flex gap-3">
+                        <select id="viewStatusSelect" class="form-select flex-1">
+                            <option value="PENDING">Pending</option>
+                            <option value="APPROVED">Approved</option>
+                            <option value="REJECTED">Rejected</option>
+                        </select>
+                        <button onclick="updateApplicationStatus()" class="btn-primary">
+                            <i class="fas fa-save mr-2"></i> Update Status
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <div class="modal-footer">
+            <button class="btn-secondary" id="viewModalCancelBtn">
+                <i class="fas fa-times mr-2"></i> Close
+            </button>
+            <button class="btn-primary" onclick="frappe.set_route('Form', 'Student Applicant', currentViewingApp)">
+                <i class="fas fa-external-link-alt mr-2"></i> Open in Frappe
+            </button>
+        </div>
+    </div>
+</div>

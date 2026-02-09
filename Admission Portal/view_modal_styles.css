@@ -1,0 +1,367 @@
+/* === VIEW MODAL STYLES === */
+
+.view-modal-content {
+    max-width: 900px !important;
+    width: 95% !important;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid #f3f4f6;
+    background: linear-gradient(135deg, #7b0200 0%, #5a0100 100%);
+    color: white;
+}
+
+.modal-header .modal-title {
+    color: white;
+    margin: 0;
+}
+
+.modal-header .modal-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.875rem;
+    margin: 0.25rem 0 0 0;
+}
+
+.modal-action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+}
+
+.modal-action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.modal-header .modal-close {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.modal-header .modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fcb31c;
+}
+
+/* Tabs Navigation */
+.view-modal-tabs {
+    display: flex;
+    gap: 0;
+    background: #f9fafb;
+    border-bottom: 2px solid #e5e7eb;
+    padding: 0;
+    overflow-x: auto;
+}
+
+.view-tab {
+    flex: 1;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.view-tab i {
+    font-size: 1rem;
+}
+
+.view-tab:hover {
+    background: #fff;
+    color: #7b0200;
+}
+
+.view-tab.active {
+    background: #fff;
+    color: #7b0200;
+    border-bottom-color: #7b0200;
+}
+
+.view-tab.active i {
+    color: #fcb31c;
+}
+
+/* Modal Body */
+.view-modal-body {
+    padding: 0;
+    overflow-y: auto;
+    flex: 1;
+    background: #fff;
+}
+
+.view-tab-content {
+    display: none;
+    padding: 2rem;
+    animation: fadeIn 0.2s ease;
+}
+
+.view-tab-content.active {
+    display: block;
+}
+
+/* View Sections */
+.view-section {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.view-section:last-child {
+    margin-bottom: 0;
+}
+
+.view-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.view-section-title i {
+    font-size: 1.25rem;
+}
+
+/* View Grid */
+.view-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.view-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.view-field.full-width {
+    grid-column: 1 / -1;
+}
+
+.view-field label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.view-field span {
+    font-size: 0.9375rem;
+    color: #1f2937;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    min-height: 2.75rem;
+    display: flex;
+    align-items: center;
+}
+
+/* View Table */
+.view-table-container {
+    overflow-x: auto;
+}
+
+.view-table {
+    width: 100%;
+}
+
+.view-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+.view-table thead {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+}
+
+.view-table th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.view-table td {
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+    color: #1f2937;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.view-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+.view-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Form Elements in View Modal */
+.view-modal-body .form-select {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 0.9375rem;
+    color: #1f2937;
+    background: #fff;
+    transition: all 0.2s ease;
+}
+
+.view-modal-body .form-select:focus {
+    outline: none;
+    border-color: #7b0200;
+    box-shadow: 0 0 0 3px rgba(123, 2, 0, 0.1);
+}
+
+/* Modal Footer */
+.view-modal-content .modal-footer {
+    padding: 1.25rem 2rem;
+    border-top: 2px solid #f3f4f6;
+    background: #f9fafb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .view-modal-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0 !important;
+    }
+    
+    .view-modal-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .view-tab {
+        flex: 0 0 auto;
+        min-width: 100px;
+        padding: 0.75rem 1rem;
+    }
+    
+    .view-tab span {
+        display: none;
+    }
+    
+    .view-tab i {
+        font-size: 1.25rem;
+    }
+    
+    .view-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .view-section {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .view-tab-content {
+        padding: 1rem;
+    }
+    
+    .modal-header {
+        padding: 1rem;
+    }
+    
+    .view-modal-content .modal-footer {
+        padding: 1rem;
+        flex-direction: column;
+    }
+    
+    .view-modal-content .modal-footer button {
+        width: 100%;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .modal-header,
+    .view-modal-tabs,
+    .modal-footer,
+    .modal-action-btn,
+    .modal-close {
+        display: none !important;
+    }
+    
+    .view-modal-content {
+        max-width: 100% !important;
+        width: 100% !important;
+        max-height: none !important;
+        box-shadow: none !important;
+    }
+    
+    .view-tab-content {
+        display: block !important;
+        page-break-inside: avoid;
+    }
+    
+    .view-section {
+        page-break-inside: avoid;
+        border: 1px solid #000;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Status Badge in View Modal */
+.view-modal-body .status-badge {
+    display: inline-flex;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}

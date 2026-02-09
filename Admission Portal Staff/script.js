@@ -1,18 +1,10 @@
 // ========================================
-// PCCR Admission Portal - JavaScript Logic
-// UPDATED: Strict Role-Based Access Control (RBAC)
-// ========================================
-// 
-// RBAC Rules:
-// 1. isHead = true ONLY for "Admission Head" OR "System Manager" roles
-// 2. Staff users ONLY fetch data assigned to them (strict filtering)
-// 3. Staff users see "Admission Staff Workspace" title
-// 4. Staff users cannot see "Assigned To" column or "Assign" button
-// 5. Staff users can only approve/reject applications assigned to them
+// PCCR Admission Portal - ADMISSION STAFF
+// For users with "Admission Staff" role
 // ========================================
 
 // === GLOBAL VARIABLES ===
-let isHead = false; // Default to Staff for security (RBAC Rule #1)
+const isHead = false; // HARDCODED for Admission Staff portal
 let currentUserEmail = '';
 let currentPage = 1;
 let totalPages = 1;
@@ -36,80 +28,10 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
 });
 
-// Frappe Ready
+// Frappe Ready - Simplified for Head portal
 if (typeof frappe !== 'undefined') {
     frappe.ready(function() {
         currentUserEmail = frappe.session.user;
-        
-        // Try multiple sources for user roles (in order of reliability)
-        let userRoles = [];
-        
-        // Method 1: Check frappe.boot.user.roles (most reliable)
-        if (frappe.boot && frappe.boot.user && frappe.boot.user.roles) {
-            userRoles = frappe.boot.user.roles;
-            console.log('✓ Roles from frappe.boot.user.roles:', userRoles);
-        }
-        // Method 2: Check frappe.user_roles
-        else if (frappe.user_roles && frappe.user_roles.length > 0) {
-            userRoles = frappe.user_roles;
-            console.log('✓ Roles from frappe.user_roles:', userRoles);
-        }
-        // Method 3: Check frappe.session.user_roles
-        else if (frappe.session && frappe.session.user_roles && frappe.session.user_roles.length > 0) {
-            userRoles = frappe.session.user_roles;
-            console.log('✓ Roles from frappe.session.user_roles:', userRoles);
-        }
-        // Method 4: Fetch from server using custom whitelisted API
-        else {
-            console.log('⚠ No roles found in session, fetching from server...');
-            frappe.call({
-                method: 'get_user_roles',
-                callback: function(r) {
-                    console.log('Server response:', r);
-                    if (r.message) {
-                        // Handle both array and object responses
-                        if (Array.isArray(r.message)) {
-                            userRoles = r.message;
-                        } else if (typeof r.message === 'object' && r.message.data) {
-                            userRoles = r.message.data;
-                        } else {
-                            userRoles = [];
-                        }
-                        frappe.user_roles = userRoles;
-                        console.log('✓ Roles fetched from custom API:', userRoles);
-                        initializeDashboard();
-                    } else {
-                        console.error('✗ Invalid response from server:', r);
-                        frappe.user_roles = [];
-                        initializeDashboard();
-                    }
-                },
-                error: function(err) {
-                    console.error('✗ Error calling custom API:', err);
-                    console.error('⚠ Server Script has an error!');
-                    console.log('%cServer Script Fix:', 'color: #fcb31c; font-size: 14px; font-weight: bold;');
-                    console.log('Replace your Server Script code with this EXACT code:');
-                    console.log('%c' + 
-                        'import frappe\n\n' +
-                        '# Get the current user\'s roles\n' +
-                        'user = frappe.session.user\n\n' +
-                        'if user == "Guest":\n' +
-                        '    frappe.response[\'message\'] = []\n' +
-                        'else:\n' +
-                        '    frappe.response[\'message\'] = frappe.get_roles(user)', 
-                        'background: #f0f0f0; padding: 10px; font-family: monospace;'
-                    );
-                    frappe.user_roles = [];
-                    initializeDashboard();
-                }
-            });
-            return; // Exit early, callback will handle initialization
-        }
-        
-        // Store roles globally
-        frappe.user_roles = userRoles;
-        
-        // Initialize dashboard with available role information
         initializeDashboard();
     });
 } else {
@@ -193,50 +115,13 @@ async function initializeDashboard() {
         return;
     }
 
-    // Check user role - compatible with all Frappe versions
-    // Try multiple sources for roles (in priority order)
-    let roles = [];
-    
-    if (frappe.user_roles && frappe.user_roles.length > 0) {
-        roles = frappe.user_roles;
-        console.log('✓ Using frappe.user_roles');
-    } else if (frappe.boot && frappe.boot.user && frappe.boot.user.roles && frappe.boot.user.roles.length > 0) {
-        roles = frappe.boot.user.roles;
-        console.log('✓ Using frappe.boot.user.roles');
-    } else if (frappe.session && frappe.session.user_roles && frappe.session.user_roles.length > 0) {
-        roles = frappe.session.user_roles;
-        console.log('✓ Using frappe.session.user_roles');
-    } else {
-        console.warn('⚠ No roles found in any source!');
-        console.log('Debug - frappe.user_roles:', frappe.user_roles);
-        console.log('Debug - frappe.boot:', frappe.boot);
-        console.log('Debug - frappe.session:', frappe.session);
-    }
-    
-    // Allow access if Admission Head OR System Manager
-    isHead = roles.includes("Admission Head") || roles.includes("System Manager"); 
+    // Set user info (Admission Staff portal)
+    const userName = frappe.session.user_fullname || frappe.session.user || 'User';
     currentUserEmail = frappe.session.user;
     
-    console.log('User roles:', roles);
-    console.log('Is Head:', isHead);
-    
-    // Set user info
-    const userRole = isHead ? 'Admission Head' : 'Admission Staff';
-    const title = isHead ? 'Admission Head Control Panel' : 'Admission Staff Workspace';
-    const userName = frappe.session.user_fullname || frappe.session.user || 'User';
-    
     document.getElementById('userName').textContent = userName;
-    document.getElementById('userRole').textContent = userRole;
-    document.getElementById('dashboardTitle').textContent = title;
-    
-    // Show/hide assignment column for heads
-    if (isHead) {
-        const assignedHeader = document.getElementById('assignedHeader');
-        if (assignedHeader) {
-            assignedHeader.style.display = 'table-cell';
-        }
-        loadStaffMembers();
-    }
+    document.getElementById('userRole').textContent = 'Admission Staff';
+    document.getElementById('dashboardTitle').textContent = 'Admission Staff Workspace';
     
     // Setup event listeners
     setupEventListeners();
@@ -449,15 +334,10 @@ async function loadDashboardData() {
     }
 
     try {
-        // ===== RBAC Rule #2: Restrict Data Loading =====
-        // Staff users can ONLY fetch applications assigned to them
-        let filters = {};
-        if (!isHead) {
-            filters = {
-                assigned_staff: frappe.session.user 
-            };
-        }
-        // Heads fetch ALL applications (no filter)
+        // Staff only fetch applications assigned to them
+        let filters = {
+            assigned_staff: frappe.session.user
+        };
         
         // Fetch applications - UPDATED DOCTYPE NAME
         frappe.call({
@@ -476,8 +356,9 @@ async function loadDashboardData() {
                 if (r.message) {
                     applicationsData = r.message;
                     filteredData = [...applicationsData];
-                    updateMetrics();
+                    updateMetricsEnhanced();
                     renderTable();
+                    initializeCharts();
                 } else {
                     showEmptyState();
                 }
@@ -652,10 +533,10 @@ function renderTable() {
         return;
     }
     
-    // ===== RBAC Rule #4: Hide "Assigned To" column for Staff =====
+    // Hide "Assigned To" column (Staff doesn't see it)
     const assignedHeader = document.getElementById('assignedHeader');
     if (assignedHeader) {
-        assignedHeader.style.display = isHead ? 'table-cell' : 'none';
+        assignedHeader.style.display = 'none';
     }
     
     let html = '';
@@ -675,17 +556,9 @@ function renderTable() {
         const date = formatDate(app.application_date || app.creation);
         const initial = (app.first_name?.[0] || 'S').toUpperCase();
         
-        // Determine colspan based on role
-        const colspan = isHead ? '7' : '6';
-        
-        // ===== RBAC Rule #4: Hide "Assign" button for Staff =====
-        const assignBtn = isHead ? 
-        `<button class="btn-action btn-assign" data-app-name="${app.name}">
-            <i class="fas fa-user-plus"></i> Assign
-         </button>` : '';
-
-        const assignedColumn = isHead ? 
-            `<td>${app.assigned_staff || '<span class="text-muted">Unassigned</span>'}</td>` : '';
+        // Staff doesn't have assign button or assigned column
+        const assignBtn = '';
+        const assignedColumn = '';
         
         html += `
                 <tr class="table-row">
@@ -724,14 +597,11 @@ function showEmptyState() {
     const tbody = document.getElementById('applicationsTableBody');
     if (!tbody) return;
     
-    // Determine colspan based on role
-    const colspan = isHead ? '7' : '6';
-    
     tbody.innerHTML = `
         <tr>
-            <td colspan="${colspan}" class="empty-state">
+            <td colspan="6" class="empty-state">
                 <i class="fas fa-inbox"></i>
-                <p>No applications found</p>
+                <p>No applications assigned to you</p>
             </td>
         </tr>
     `;
@@ -1069,6 +939,11 @@ function switchSection(sectionName) {
     if (targetSection) {
         targetSection.classList.add('active');
         targetSection.style.display = 'block';
+        
+        // Initialize reports charts when switching to reports section
+        if (sectionName === 'reports' && applicationsData.length > 0) {
+            setTimeout(() => renderReportsCharts(), 100);
+        }
     }
 }
 
@@ -1281,27 +1156,13 @@ function populateViewModal(data) {
     setViewField('view_creation', formatDateTime(data.creation));
     setViewField('view_modified', formatDateTime(data.modified));
     
-    // Show status update section for Admission Head
-    const statusUpdateSection = document.getElementById('viewStatusUpdate');
-    if (isHead && statusUpdateSection) {
-        statusUpdateSection.style.display = 'block';
-        document.getElementById('viewStatusSelect').value = data.application_status || 'PENDING';
-    }
-    
-    // ===== RBAC Rule #5: Hide Approve/Reject buttons based on role =====
-    // Staff can only approve/reject if application is assigned to them
+    // Staff can only approve/reject applications assigned to them
     const modalFooter = document.querySelector('#viewModal .modal-footer');
     if (modalFooter) {
-        if (isHead) {
-            // Admission Head can always approve/reject
+        if (data.assigned_staff === frappe.session.user) {
             modalFooter.style.display = 'flex';
         } else {
-            // Staff can only approve/reject if assigned to them
-            if (data.assigned_staff === frappe.session.user) {
-                modalFooter.style.display = 'flex';
-            } else {
-                modalFooter.style.display = 'none';
-            }
+            modalFooter.style.display = 'none';
         }
     }
 }
@@ -1612,6 +1473,450 @@ function formatDateTime(dateString) {
 }
 
 
+// ========================================
+// CHARTS & ANALYTICS (ADMISSION STAFF)
+// ========================================
+
+let chartsInitialized = false;
+let chartInstances = {};
+
+// Initialize overview charts
+function initializeCharts() {
+    if (chartsInitialized) return;
+    if (typeof ApexCharts === 'undefined') {
+        console.warn('ApexCharts not loaded');
+        return;
+    }
+    
+    renderMyStatusChart();
+    renderMyActivityChart();
+    chartsInitialized = true;
+}
+
+// Render detailed charts for Reports section
+function renderReportsCharts() {
+    if (typeof ApexCharts === 'undefined') return;
+    
+    renderMyProcessingTimelineChart();
+    renderMyProgramChart();
+    renderMyWeeklyChart();
+    renderMyStatsTable();
+}
+
+// === OVERVIEW CHARTS ===
+
+// My Status Distribution (Donut Chart)
+function renderMyStatusChart() {
+    const pending = applicationsData.filter(app => app.application_status === 'PENDING').length;
+    const approved = applicationsData.filter(app => app.application_status === 'APPROVED').length;
+    const rejected = applicationsData.filter(app => app.application_status === 'REJECTED').length;
+    
+    const options = {
+        series: [pending, approved, rejected],
+        chart: {
+            type: 'donut',
+            height: 300,
+            fontFamily: 'Inter, sans-serif'
+        },
+        labels: ['Pending', 'Approved', 'Rejected'],
+        colors: ['#fcb31c', '#10b981', '#ef4444'],
+        legend: {
+            position: 'bottom',
+            fontSize: '14px'
+        },
+        dataLabels: {
+            enabled: true,
+            formatter: function(val, opts) {
+                return opts.w.config.series[opts.seriesIndex];
+            }
+        },
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '70%',
+                    labels: {
+                        show: true,
+                        total: {
+                            show: true,
+                            label: 'Total',
+                            fontSize: '16px',
+                            fontWeight: 600,
+                            color: '#1f2937'
+                        }
+                    }
+                }
+            }
+        }
+    };
+    
+    if (chartInstances.myStatus) {
+        chartInstances.myStatus.destroy();
+    }
+    
+    const chart = new ApexCharts(document.querySelector("#myStatusChart"), options);
+    chart.render();
+    chartInstances.myStatus = chart;
+}
+
+// My Activity (Last 7 Days)
+function renderMyActivityChart() {
+    const last7Days = getLast7Days();
+    const activityData = calculateMyDailyActivity(last7Days);
+    
+    const options = {
+        series: [{
+            name: 'Processed',
+            data: activityData.counts
+        }],
+        chart: {
+            type: 'bar',
+            height: 300,
+            fontFamily: 'Inter, sans-serif',
+            toolbar: {
+                show: false
+            }
+        },
+        colors: ['#7b0200'],
+        xaxis: {
+            categories: activityData.dates
+        },
+        yaxis: {
+            title: {
+                text: 'Applications'
+            }
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 6,
+                columnWidth: '70%'
+            }
+        },
+        dataLabels: {
+            enabled: true
+        },
+        grid: {
+            borderColor: '#f3f4f6'
+        }
+    };
+    
+    if (chartInstances.myActivity) {
+        chartInstances.myActivity.destroy();
+    }
+    
+    const chart = new ApexCharts(document.querySelector("#myActivityChart"), options);
+    chart.render();
+    chartInstances.myActivity = chart;
+}
+
+// === REPORTS SECTION CHARTS ===
+
+// My Processing Timeline (Area Chart)
+function renderMyProcessingTimelineChart() {
+    const last30Days = getLast30Days();
+    const timelineData = calculateMyTimeline(last30Days);
+    
+    const options = {
+        series: [{
+            name: 'Approved',
+            data: timelineData.approved
+        }, {
+            name: 'Rejected',
+            data: timelineData.rejected
+        }],
+        chart: {
+            type: 'area',
+            height: 350,
+            fontFamily: 'Inter, sans-serif',
+            stacked: false
+        },
+        colors: ['#10b981', '#ef4444'],
+        xaxis: {
+            categories: timelineData.dates,
+            labels: {
+                rotate: -45
+            }
+        },
+        yaxis: {
+            title: {
+                text: 'Applications'
+            }
+        },
+        stroke: {
+            curve: 'smooth',
+            width: 2
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                opacityFrom: 0.6,
+                opacityTo: 0.1
+            }
+        },
+        legend: {
+            position: 'top'
+        },
+        dataLabels: {
+            enabled: false
+        }
+    };
+    
+    if (chartInstances.myTimeline) {
+        chartInstances.myTimeline.destroy();
+    }
+    
+    const chart = new ApexCharts(document.querySelector("#myProcessingTimelineChart"), options);
+    chart.render();
+    chartInstances.myTimeline = chart;
+}
+
+// My Program Distribution
+function renderMyProgramChart() {
+    const programCounts = {};
+    applicationsData.forEach(app => {
+        const program = app.program || 'Not Specified';
+        programCounts[program] = (programCounts[program] || 0) + 1;
+    });
+    
+    const options = {
+        series: [{
+            data: Object.values(programCounts)
+        }],
+        chart: {
+            type: 'bar',
+            height: 350,
+            fontFamily: 'Inter, sans-serif'
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 8,
+                horizontal: true,
+                distributed: true
+            }
+        },
+        colors: ['#7b0200', '#fcb31c', '#10b981', '#3b82f6'],
+        xaxis: {
+            categories: Object.keys(programCounts)
+        },
+        dataLabels: {
+            enabled: true
+        },
+        legend: {
+            show: false
+        }
+    };
+    
+    if (chartInstances.myProgram) {
+        chartInstances.myProgram.destroy();
+    }
+    
+    const chart = new ApexCharts(document.querySelector("#myProgramChart"), options);
+    chart.render();
+    chartInstances.myProgram = chart;
+}
+
+// My Weekly Activity
+function renderMyWeeklyChart() {
+    const weeklyData = calculateMyWeeklyData();
+    
+    const options = {
+        series: [{
+            name: 'Processed',
+            data: weeklyData.counts
+        }],
+        chart: {
+            type: 'bar',
+            height: 350,
+            fontFamily: 'Inter, sans-serif'
+        },
+        colors: ['#7b0200'],
+        xaxis: {
+            categories: weeklyData.weeks
+        },
+        yaxis: {
+            title: {
+                text: 'Applications'
+            }
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 8,
+                columnWidth: '60%'
+            }
+        },
+        dataLabels: {
+            enabled: true
+        }
+    };
+    
+    if (chartInstances.myWeekly) {
+        chartInstances.myWeekly.destroy();
+    }
+    
+    const chart = new ApexCharts(document.querySelector("#myWeeklyChart"), options);
+    chart.render();
+    chartInstances.myWeekly = chart;
+}
+
+// === DATA CALCULATION HELPERS ===
+
+function getLast7Days() {
+    const days = [];
+    const today = new Date();
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        days.push(date);
+    }
+    return days;
+}
+
+function getLast30Days() {
+    const days = [];
+    const today = new Date();
+    for (let i = 29; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        days.push(date);
+    }
+    return days;
+}
+
+function calculateMyDailyActivity(days) {
+    const dates = days.map(d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    const counts = days.map(day => {
+        return applicationsData.filter(app => {
+            const modDate = new Date(app.modified);
+            return modDate.toDateString() === day.toDateString() && 
+                   (app.application_status === 'APPROVED' || app.application_status === 'REJECTED');
+        }).length;
+    });
+    
+    return { dates, counts };
+}
+
+function calculateMyTimeline(days) {
+    const dates = days.map(d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    const approved = [];
+    const rejected = [];
+    
+    days.forEach(day => {
+        const dayStr = day.toDateString();
+        approved.push(applicationsData.filter(app => 
+            app.application_status === 'APPROVED' && new Date(app.modified).toDateString() === dayStr
+        ).length);
+        rejected.push(applicationsData.filter(app => 
+            app.application_status === 'REJECTED' && new Date(app.modified).toDateString() === dayStr
+        ).length);
+    });
+    
+    return { dates, approved, rejected };
+}
+
+function calculateMyWeeklyData() {
+    const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+    const counts = [];
+    const today = new Date();
+    
+    for (let i = 0; i < 4; i++) {
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - (i + 1) * 7);
+        const weekEnd = new Date(today);
+        weekEnd.setDate(today.getDate() - i * 7);
+        
+        const count = applicationsData.filter(app => {
+            const modDate = new Date(app.modified);
+            return modDate >= weekStart && modDate < weekEnd &&
+                   (app.application_status === 'APPROVED' || app.application_status === 'REJECTED');
+        }).length;
+        
+        counts.unshift(count);
+    }
+    
+    return { weeks, counts };
+}
+
+// My Statistics Table
+function renderMyStatsTable() {
+    const tbody = document.getElementById('myStatsTableBody');
+    if (!tbody) return;
+    
+    const total = applicationsData.length;
+    const pending = applicationsData.filter(app => app.application_status === 'PENDING').length;
+    const approved = applicationsData.filter(app => app.application_status === 'APPROVED').length;
+    const rejected = applicationsData.filter(app => app.application_status === 'REJECTED').length;
+    const processed = approved + rejected;
+    const approvalRate = processed > 0 ? ((approved / processed) * 100).toFixed(1) : 0;
+    
+    // Last 30 days processed
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const processed30d = applicationsData.filter(app => 
+        (app.application_status === 'APPROVED' || app.application_status === 'REJECTED') &&
+        new Date(app.modified) >= thirtyDaysAgo
+    ).length;
+    
+    // Last 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const processed7d = applicationsData.filter(app => 
+        (app.application_status === 'APPROVED' || app.application_status === 'REJECTED') &&
+        new Date(app.modified) >= sevenDaysAgo
+    ).length;
+    
+    const stats = [
+        { metric: 'Total Assigned to Me', value: total, status: '📊 All time' },
+        { metric: 'Pending My Review', value: pending, status: pending > 0 ? '⚠ Action needed' : '✓ All done' },
+        { metric: 'Total Approved', value: approved, status: '✓ Completed' },
+        { metric: 'Total Rejected', value: rejected, status: '✗ Declined' },
+        { metric: 'Processed (Last 30d)', value: processed30d, status: `${processed30d} apps` },
+        { metric: 'Processed (Last 7d)', value: processed7d, status: `${processed7d} apps` },
+        { metric: 'My Approval Rate', value: `${approvalRate}%`, status: approvalRate > 70 ? '✓ Good' : '⚠ Review' }
+    ];
+    
+    let html = '';
+    stats.forEach(stat => {
+        html += `
+            <tr>
+                <td style="font-weight: 600;">${stat.metric}</td>
+                <td style="font-size: 1.125rem; font-weight: 700; color: #7b0200;">${stat.value}</td>
+                <td style="color: #6b7280;">${stat.status}</td>
+            </tr>
+        `;
+    });
+    
+    tbody.innerHTML = html;
+}
+
+// === UPDATE METRICS WITH ENHANCED DATA ===
+function updateMetricsEnhanced() {
+    const total = applicationsData.length;
+    const pending = applicationsData.filter(app => app.application_status === 'PENDING' || !app.application_status).length;
+    
+    // Last 30 days completed
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const completed30d = applicationsData.filter(app => 
+        (app.application_status === 'APPROVED' || app.application_status === 'REJECTED') &&
+        new Date(app.modified) >= thirtyDaysAgo
+    ).length;
+    
+    const approvedTotal = applicationsData.filter(app => app.application_status === 'APPROVED').length;
+    const rejectedTotal = applicationsData.filter(app => app.application_status === 'REJECTED').length;
+    const approvalRate = (approvedTotal + rejectedTotal) > 0 ? 
+        Math.round((approvedTotal / (approvedTotal + rejectedTotal)) * 100) : 0;
+    
+    // Update counters
+    animateCounter('totalApplications', total);
+    animateCounter('pendingReview', pending);
+    animateCounter('myAssignments', completed30d);
+    
+    const approvalRateEl = document.getElementById('myApprovalRate');
+    if (approvalRateEl) {
+        approvalRateEl.textContent = approvalRate + '%';
+    }
+}
+
 // === EXPOSE FUNCTIONS TO WINDOW ===
 window.viewApplication = viewApplication;
 window.openAssignmentModal = openAssignmentModal;
@@ -1619,8 +1924,10 @@ window.closeAssignmentModal = closeAssignmentModal;
 window.confirmAssignment = confirmAssignment;
 window.refreshDashboard = refreshDashboard;
 window.showNotifications = showNotifications;
+window.switchViewTab = switchViewTab;
+window.printApplication = printApplication;
 
 // === CONSOLE MESSAGE ===
-console.log('%c🎓 PCCR Admission Portal', 'color: #7b0200; font-size: 20px; font-weight: bold;');
+console.log('%c🎓 PCCR Admission Portal - STAFF', 'color: #7b0200; font-size: 20px; font-weight: bold;');
 console.log('%cPro Bono Publico et Patria', 'color: #fcb31c; font-style: italic;');
 console.log('%cUsing DocType: ' + DOCTYPE_NAME, 'color: #666; font-size: 12px;');
