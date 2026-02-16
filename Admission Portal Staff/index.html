@@ -357,19 +357,19 @@
             </div>
         </div>
         
-        <!-- Tabs Navigation -->
+        <!-- Tabs Navigation: Personal, Education, Documents, Status -->
         <div class="view-modal-tabs">
-            <button class="view-tab active" data-tab="admission" onclick="switchViewTab('admission')">
-                <i class="fas fa-clipboard-check"></i>
-                <span>Admission</span>
-            </button>
-            <button class="view-tab" data-tab="personal" onclick="switchViewTab('personal')">
+            <button class="view-tab active" data-tab="personal" onclick="switchViewTab('personal')">
                 <i class="fas fa-user"></i>
                 <span>Personal</span>
             </button>
-            <button class="view-tab" data-tab="guardian" onclick="switchViewTab('guardian')">
-                <i class="fas fa-users"></i>
-                <span>Guardian & Address</span>
+            <button class="view-tab" data-tab="education" onclick="switchViewTab('education')">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Education</span>
+            </button>
+            <button class="view-tab" data-tab="documents" onclick="switchViewTab('documents')">
+                <i class="fas fa-file-alt"></i>
+                <span>Documents</span>
             </button>
             <button class="view-tab" data-tab="status" onclick="switchViewTab('status')">
                 <i class="fas fa-info-circle"></i>
@@ -379,45 +379,8 @@
         
         <div class="modal-body view-modal-body">
             
-            <!-- Tab 1: Admission Details -->
-            <div id="admissionTab" class="view-tab-content active">
-                <div class="view-section">
-                    <h4 class="view-section-title">Admission Information</h4>
-                    <div class="view-grid">
-                        <div class="view-field">
-                            <label>Application ID</label>
-                            <span id="view_name">-</span>
-                        </div>
-                        <div class="view-field">
-                            <label>Application Date</label>
-                            <span id="view_application_date">-</span>
-                        </div>
-                        <div class="view-field">
-                            <label>Student Category</label>
-                            <span id="view_student_category">-</span>
-                        </div>
-                        <div class="view-field">
-                            <label>Program Applied For</label>
-                            <span id="view_program">-</span>
-                        </div>
-                        <div class="view-field">
-                            <label>Academic Year</label>
-                            <span id="view_academic_year">-</span>
-                        </div>
-                        <div class="view-field">
-                            <label>Academic Term</label>
-                            <span id="view_academic_term">-</span>
-                        </div>
-                        <div class="view-field full-width">
-                            <label>Agent/Referrer</label>
-                            <span id="view_agent">-</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Tab 2: Personal Information -->
-            <div id="personalTab" class="view-tab-content">
+            <!-- Tab 1: Personal (merged: personal + contact + address + guardians + siblings) -->
+            <div id="personalTab" class="view-tab-content active">
                 <div class="view-section">
                     <h4 class="view-section-title">Personal Details</h4>
                     <div class="view-grid">
@@ -457,9 +420,12 @@
                             <label>Mother Tongue</label>
                             <span id="view_mother_tongue">-</span>
                         </div>
+                        <div class="view-field">
+                            <label>IP (Ethnic Group)</label>
+                            <span id="view_ip_ethnic">-</span>
+                        </div>
                     </div>
                 </div>
-                
                 <div class="view-section">
                     <h4 class="view-section-title">Contact Information</h4>
                     <div class="view-grid">
@@ -477,10 +443,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Tab 3: Guardian & Address -->
-            <div id="guardianTab" class="view-tab-content">
                 <div class="view-section">
                     <h4 class="view-section-title">Home Address</h4>
                     <div class="view-grid">
@@ -514,18 +476,63 @@
                         </div>
                     </div>
                 </div>
-                
                 <div class="view-section">
                     <h4 class="view-section-title">Guardian Details</h4>
                     <div id="view_guardians_list" class="view-table-container">
-                        <p class="text-muted">No guardian information available</p>
+                        <p class="text-gray-500 text-sm italic">No guardian information available</p>
                     </div>
                 </div>
-                
                 <div class="view-section">
                     <h4 class="view-section-title">Sibling Details</h4>
                     <div id="view_siblings_list" class="view-table-container">
-                        <p class="text-muted">No sibling information available</p>
+                        <p class="text-gray-500 text-sm italic">No sibling information available</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab 2: Education -->
+            <div id="educationTab" class="view-tab-content">
+                <div class="view-section">
+                    <h4 class="view-section-title">Admission / Education Information</h4>
+                    <div class="view-grid">
+                        <div class="view-field">
+                            <label>Application ID</label>
+                            <span id="view_name">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Application Date</label>
+                            <span id="view_application_date">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Student Category</label>
+                            <span id="view_student_category">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Program Applied For</label>
+                            <span id="view_program">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Academic Year</label>
+                            <span id="view_academic_year">-</span>
+                        </div>
+                        <div class="view-field">
+                            <label>Academic Term</label>
+                            <span id="view_academic_term">-</span>
+                        </div>
+                        <div class="view-field full-width">
+                            <label>Agent/Referrer</label>
+                            <span id="view_agent">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab 3: Documents -->
+            <div id="documentsTab" class="view-tab-content">
+                <div class="view-section">
+                    <h4 class="view-section-title">Required Documents</h4>
+                    <div id="view_documents_list" class="view-documents-container">
+                        <p class="text-gray-500 text-sm italic">Loading...</p>
                     </div>
                 </div>
             </div>

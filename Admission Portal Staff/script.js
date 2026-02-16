@@ -1126,16 +1126,7 @@ function populateViewModal(data) {
     document.getElementById('viewModalSubtitle').textContent = 
         `Student Application #${data.name}`;
     
-    // Tab 1: Admission Details
-    setViewField('view_name', data.name);
-    setViewField('view_application_date', formatDate(data.application_date));
-    setViewField('view_student_category', data.student_category);
-    setViewField('view_program', data.program);
-    setViewField('view_academic_year', data.academic_year);
-    setViewField('view_academic_term', data.academic_term);
-    setViewField('view_agent', data.agent || 'No agent');
-    
-    // Tab 2: Personal Information
+    // Personal tab
     setViewField('view_first_name', data.first_name);
     setViewField('view_middle_name', data.middle_name);
     setViewField('view_last_name', data.last_name);
@@ -1145,11 +1136,10 @@ function populateViewModal(data) {
     setViewField('view_nationality', data.nationality);
     setViewField('view_religion', data.religion);
     setViewField('view_mother_tongue', data.mother_tongue);
+    setViewField('view_ip_ethnic', data.ip__ethic_group_);
     setViewField('view_student_email_id', data.student_email_id);
     setViewField('view_student_mobile_number', data.student_mobile_number);
     setViewField('view_home_phone_number', data.home_phone_number);
-    
-    // Tab 3: Guardian & Address
     setViewField('view_address_line_1', data.address_line_1);
     setViewField('view_address_line_2', data.address_line_2);
     setViewField('view_barangay', data.barangay);
@@ -1157,14 +1147,22 @@ function populateViewModal(data) {
     setViewField('view_province', data.province);
     setViewField('view_state', data.state);
     setViewField('view_pincode', data.pincode);
-    
-    // Guardian list
     populateGuardiansList(data.guardians);
-    
-    // Siblings list
     populateSiblingsList(data.siblings);
     
-    // Tab 4: Status
+    // Education tab
+    setViewField('view_name', data.name);
+    setViewField('view_application_date', formatDate(data.application_date));
+    setViewField('view_student_category', data.student_category);
+    setViewField('view_program', data.program);
+    setViewField('view_academic_year', data.academic_year);
+    setViewField('view_academic_term', data.academic_term);
+    setViewField('view_agent', data.agent || 'No agent');
+    
+    // Documents tab
+    populateDocumentsList(data);
+    
+    // Status tab
     const statusInfo = STATUS_MAP[data.application_status] || STATUS_MAP['PENDING'];
     const statusHTML = `<span class="status-badge status-${statusInfo.class}">${statusInfo.display}</span>`;
     document.getElementById('view_application_status').innerHTML = statusHTML;
@@ -1263,7 +1261,45 @@ function populateSiblingsList(siblings) {
     container.innerHTML = html;
 }
 
-// Switch between view tabs
+// Populate documents list (view-only links or "Not uploaded")
+function populateDocumentsList(data) {
+    const container = document.getElementById('view_documents_list');
+    if (!container) return;
+    
+    var baseUrl = (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : '';
+    function docUrl(path) {
+        if (!path) return null;
+        return (path.indexOf('/') === 0) ? (baseUrl + path) : path;
+    }
+    
+    var docSpecs = [
+        { key: 'form_138', label: 'Form 138 (Grade 12 Report Card)' },
+        { key: 'photo_2x2', label: '2x2 Photo' },
+        { key: 'government_id', label: 'School ID / Government ID' },
+        { key: 'birth_certificate', label: 'PSA Birth Certificate' },
+        { key: 'good_moral', label: 'Certificate of Good Moral Character' },
+        { key: 'form_137', label: 'Form 137 (Transcript of Records) - If available' },
+        { key: 'honorable_dismissal', label: 'Certificate of Honorable Dismissal (Transferees)' }
+    ];
+    
+    var html = '<div class="view-grid">';
+    docSpecs.forEach(function(spec) {
+        if (spec.key === 'honorable_dismissal' && data.student_category !== 'Transferee') {
+            return;
+        }
+        var url = docUrl(data[spec.key]);
+        html += '<div class="view-field"><label>' + spec.label + '</label>';
+        if (url) {
+            html += '<span><a href="' + url + '" target="_blank" rel="noopener">View / Download</a></span>';
+        } else {
+            html += '<span class="text-gray-500">Not uploaded</span>';
+        }
+        html += '</div>';
+    });
+    html += '</div>';
+    container.innerHTML = html;
+}
+
 // Switch between view tabs
 function switchViewTab(tabName) {
     // Update tab buttons
@@ -1292,7 +1328,7 @@ function openViewModal() {
     
     modal.classList.add('modal-active');
     document.body.style.overflow = 'hidden';
-    switchViewTab('admission');
+    switchViewTab('personal');
 }
 
 // Close view modal
