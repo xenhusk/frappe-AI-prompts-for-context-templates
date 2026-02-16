@@ -3,30 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PCCR - Admission Head Control Panel</title>
-    <link rel="icon" href="https://cutover.pccr.edu.ph/files/pccr-logo.png">
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Tailwind Custom Config with PCCR Colors -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'pccr-red': '#7b0200',
-                        'pccr-red-dark': '#5a0100',
-                        'pccr-gold': '#fcb31c',
-                        'pccr-gold-dark': '#e09a00',
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Admission Head Control Panel</title>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -34,34 +11,12 @@
     <!-- Custom Styles -->
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gray-50 font-['Inter']">
+<body>
     
     <!-- Loading Screen -->
-    <div id="loadingScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-pccr-red to-pccr-red-dark">
-        <img src="https://cutover.pccr.edu.ph/files/pccr-logo.png" alt="PCCR Logo" class="w-24 h-24 mb-6 animate-bounce">
-        <div class="text-white text-xl font-semibold mb-4">Philippine College of Criminology</div>
+    <div id="loadingScreen" class="loading-screen">
         <div class="loader"></div>
-    </div>
-
-    <!-- Decorative Background Elements -->
-    <div class="bg-decoration">
-        <div class="accent-line line-1"></div>
-        <div class="accent-line line-2"></div>
-        <div class="accent-line line-3"></div>
-        <div class="particles">
-            <div class="particle" style="left: 10%; top: 20%; animation-delay: 0s;"></div>
-            <div class="particle gold" style="left: 85%; top: 15%; animation-delay: 2s;"></div>
-            <div class="particle" style="left: 25%; top: 60%; animation-delay: 4s;"></div>
-            <div class="particle gold" style="left: 75%; top: 75%; animation-delay: 1s;"></div>
-            <div class="particle" style="left: 50%; top: 40%; animation-delay: 3s;"></div>
-            <div class="particle gold" style="left: 65%; top: 25%; animation-delay: 5s;"></div>
-            <div class="particle" style="left: 15%; top: 80%; animation-delay: 2.5s;"></div>
-            <div class="particle" style="left: 90%; top: 50%; animation-delay: 1.5s;"></div>
-            <div class="particle gold" style="left: 40%; top: 10%; animation-delay: 3.5s;"></div>
-            <div class="particle" style="left: 70%; top: 90%; animation-delay: 4.5s;"></div>
-            <div class="particle" style="left: 30%; top: 35%; animation-delay: 0.5s;"></div>
-            <div class="particle gold" style="left: 55%; top: 65%; animation-delay: 2.8s;"></div>
-        </div>
+        <p class="loading-text">Loading...</p>
     </div>
 
     <!-- Dashboard Wrapper -->
@@ -70,9 +25,7 @@
         <!-- Sidebar -->
         <aside id="dashboardSidebar" class="dashboard-sidebar">
             <div class="sidebar-header">
-                <img src="https://cutover.pccr.edu.ph/files/pccr-logo.png" alt="PCCR Logo" class="sidebar-logo">
                 <h2 class="sidebar-title">Admission Portal</h2>
-                <p class="sidebar-motto">Pro Bono Publico et Patria</p>
             </div>
             
             <nav class="sidebar-nav">
@@ -115,14 +68,9 @@
         <!-- Main Content -->
         <main class="dashboard-main">
             
-            <!-- Header Card -->
-            <div class="dashboard-header-card">
-                <div class="relative">
-                    <!-- Decorative circles -->
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-pccr-gold/10 rounded-full -mr-16 -mt-8"></div>
-                    <div class="absolute bottom-0 left-0 w-24 h-24 bg-pccr-gold/10 rounded-full -ml-12 -mb-8"></div>
-                    
-                    <div class="relative z-10 header-content">
+            <!-- Page Header -->
+            <header class="page-header">
+                <div class="header-content">
                         <div>
                             <h1 id="dashboardTitle" class="dashboard-title">Admission Head Control Panel</h1>
                             <p class="dashboard-subtitle">Welcome back! Here's what's happening today.</p>
@@ -131,14 +79,14 @@
                             <button class="btn-icon" onclick="refreshDashboard()" title="Refresh">
                                 <i class="fas fa-sync-alt"></i>
                             </button>
-                            <button class="btn-icon" onclick="showNotifications()" title="Notifications">
+                            <!-- Notification bell hidden - not implemented yet -->
+                            <!-- <button class="btn-icon" onclick="showNotifications()" title="Notifications">
                                 <i class="fas fa-bell"></i>
                                 <span class="notification-badge">3</span>
-                            </button>
+                            </button> -->
                         </div>
-                    </div>
                 </div>
-            </div>
+            </header>
             
         <!-- Overview Section -->
         <section id="overviewSection" class="dashboard-section active">
@@ -227,10 +175,7 @@
             <div class="charts-grid" style="margin-top: 2rem;">
                 <div class="chart-card">
                     <div class="chart-header">
-                        <h3 class="chart-title">
-                            <i class="fas fa-chart-pie text-pccr-gold"></i>
-                            Status Distribution
-                        </h3>
+                        <h3 class="chart-title">Status Distribution</h3>
                         <p class="chart-subtitle">Current status breakdown</p>
                     </div>
                     <div id="statusDistributionChart" style="height: 300px;"></div>
@@ -238,10 +183,7 @@
                 
                 <div class="chart-card">
                     <div class="chart-header">
-                        <h3 class="chart-title">
-                            <i class="fas fa-chart-line text-pccr-gold"></i>
-                            Applications Trend (30 Days)
-                        </h3>
+                        <h3 class="chart-title">Applications Trend (30 Days)</h3>
                         <p class="chart-subtitle">Daily application submissions</p>
                     </div>
                     <div id="trendChart" style="height: 300px;"></div>
@@ -254,12 +196,7 @@
             <div class="table-section">
                 <div class="section-header">
                     <div>
-                        <h2 class="section-title">
-                            <span class="icon-wrapper">
-                                <i class="fas fa-file-alt"></i>
-                            </span>
-                            Student Applications
-                        </h2>
+                        <h2 class="section-title">Student Applications</h2>
                         <p class="section-description">View and manage all student application records</p>
                     </div>
                     <div class="section-actions">
@@ -318,12 +255,7 @@
         <!-- Reports Section -->
         <section id="reportsSection" class="dashboard-section">
             <div class="reports-header">
-                <h2 class="section-title">
-                    <span class="icon-wrapper">
-                        <i class="fas fa-chart-bar"></i>
-                    </span>
-                    Analytics & Reports
-                </h2>
+                <h2 class="section-title">Analytics & Reports</h2>
                 <p class="section-description">Comprehensive admission insights and performance metrics</p>
             </div>
             
@@ -333,7 +265,6 @@
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3 class="chart-title">
-                            <i class="fas fa-clipboard-list text-pccr-gold"></i>
                             Applications by Program
                         </h3>
                         <p class="chart-subtitle">Distribution across programs</p>
@@ -344,7 +275,6 @@
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3 class="chart-title">
-                            <i class="fas fa-users text-pccr-gold"></i>
                             Applications by Category
                         </h3>
                         <p class="chart-subtitle">New, Transferee, Second Courser</p>
@@ -356,7 +286,6 @@
                 <div class="chart-card chart-card-wide">
                     <div class="chart-header">
                         <h3 class="chart-title">
-                            <i class="fas fa-user-tie text-pccr-gold"></i>
                             Staff Performance Overview
                         </h3>
                         <p class="chart-subtitle">Applications assigned and processed by staff</p>
@@ -368,7 +297,6 @@
                 <div class="chart-card chart-card-wide">
                     <div class="chart-header">
                         <h3 class="chart-title">
-                            <i class="fas fa-calendar-alt text-pccr-gold"></i>
                             30-Day Application Trend
                         </h3>
                         <p class="chart-subtitle">Daily submissions and processing</p>
@@ -380,7 +308,6 @@
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3 class="chart-title">
-                            <i class="fas fa-hourglass-half text-pccr-gold"></i>
                             Processing Status
                         </h3>
                         <p class="chart-subtitle">Current application states</p>
@@ -391,7 +318,6 @@
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3 class="chart-title">
-                            <i class="fas fa-chart-area text-pccr-gold"></i>
                             Weekly Comparison
                         </h3>
                         <p class="chart-subtitle">Last 4 weeks activity</p>
@@ -404,7 +330,6 @@
             <div class="stats-table-section">
                 <div class="chart-header">
                     <h3 class="chart-title">
-                        <i class="fas fa-table text-pccr-gold"></i>
                         Detailed Statistics
                     </h3>
                     <p class="chart-subtitle">Comprehensive breakdown</p>
@@ -428,10 +353,51 @@
         
         <!-- Settings Section -->
         <section id="settingsSection" class="dashboard-section">
-            <div class="section-placeholder">
-                <i class="fas fa-cog"></i>
-                <h2>Settings</h2>
-                <p>Coming soon! Portal settings will be available here.</p>
+            <div class="settings-container">
+                <div class="settings-header">
+                    <h2 class="section-title">Portal Settings</h2>
+                    <p class="section-description">Manage your portal preferences and account</p>
+                </div>
+                
+                <div class="settings-grid">
+                    <!-- Account Section -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <h3>Account Information</h3>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="setting-item">
+                                <label>Email</label>
+                                <span id="settingsUserEmail">Loading...</span>
+                            </div>
+                            <div class="setting-item">
+                                <label>Role</label>
+                                <span id="settingsUserRole">Admission Head</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Session Section -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <h3>Session & Security</h3>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="setting-item">
+                                <label>Current Session</label>
+                                <span class="status-badge status-badge-success">
+                                    <i class="fas fa-check-circle"></i> Active
+                                </span>
+                            </div>
+                            <div class="setting-item" style="margin-top: 1.5rem;">
+                                <button class="btn-logout" onclick="handleLogout()">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Logout
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
             
@@ -453,17 +419,11 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="form-label">
-                        <i class="fas fa-user-tie text-pccr-gold mr-2"></i>
-                        Staff Member
-                    </label>
+                    <label class="form-label">Staff Member</label>
                     <select id="staffSelect" class="form-select">
                         <option value="">Select Staff Member...</option>
                     </select>
-                    <small class="form-hint">
-                        <i class="fas fa-info-circle text-pccr-gold"></i>
-                        The selected staff will be notified of the assignment
-                    </small>
+                    <small class="form-hint">The selected staff will be notified of the assignment</small>
                 </div>
                 <input type="hidden" id="selectedApplicationId">
             </div>
@@ -484,10 +444,7 @@
     <div class="modal-content view-modal-content">
         <div class="modal-header">
             <div>
-                <h3 class="modal-title">
-                    <i class="fas fa-file-alt text-pccr-gold mr-2"></i>
-                    Application Details
-                </h3>
+                <h3 class="modal-title">Application Details</h3>
                 <p class="modal-subtitle" id="viewModalSubtitle">Student Application #000</p>
             </div>
             <div class="flex items-center gap-2">
@@ -525,10 +482,7 @@
             <!-- Tab 1: Admission Details -->
             <div id="admissionTab" class="view-tab-content active">
                 <div class="view-section">
-                    <h4 class="view-section-title">
-                        <i class="fas fa-graduation-cap text-pccr-gold"></i>
-                        Admission Information
-                    </h4>
+                    <h4 class="view-section-title">Admission Information</h4>
                     <div class="view-grid">
                         <div class="view-field">
                             <label>Application ID</label>
@@ -565,10 +519,7 @@
             <!-- Tab 2: Personal Information -->
             <div id="personalTab" class="view-tab-content">
                 <div class="view-section">
-                    <h4 class="view-section-title">
-                        <i class="fas fa-id-card text-pccr-gold"></i>
-                        Personal Details
-                    </h4>
+                    <h4 class="view-section-title">Personal Details</h4>
                     <div class="view-grid">
                         <div class="view-field">
                             <label>First Name</label>
@@ -610,10 +561,7 @@
                 </div>
                 
                 <div class="view-section">
-                    <h4 class="view-section-title">
-                        <i class="fas fa-phone text-pccr-gold"></i>
-                        Contact Information
-                    </h4>
+                    <h4 class="view-section-title">Contact Information</h4>
                     <div class="view-grid">
                         <div class="view-field">
                             <label>Email Address</label>
@@ -634,10 +582,7 @@
             <!-- Tab 3: Guardian & Address -->
             <div id="guardianTab" class="view-tab-content">
                 <div class="view-section">
-                    <h4 class="view-section-title">
-                        <i class="fas fa-home text-pccr-gold"></i>
-                        Home Address
-                    </h4>
+                    <h4 class="view-section-title">Home Address</h4>
                     <div class="view-grid">
                         <div class="view-field full-width">
                             <label>Address Line 1</label>
@@ -671,20 +616,14 @@
                 </div>
                 
                 <div class="view-section">
-                    <h4 class="view-section-title">
-                        <i class="fas fa-user-friends text-pccr-gold"></i>
-                        Guardian Details
-                    </h4>
+                    <h4 class="view-section-title">Guardian Details</h4>
                     <div id="view_guardians_list" class="view-table-container">
                         <p class="text-gray-500 text-sm italic">No guardian information available</p>
                     </div>
                 </div>
                 
                 <div class="view-section">
-                    <h4 class="view-section-title">
-                        <i class="fas fa-child text-pccr-gold"></i>
-                        Sibling Details
-                    </h4>
+                    <h4 class="view-section-title">Sibling Details</h4>
                     <div id="view_siblings_list" class="view-table-container">
                         <p class="text-gray-500 text-sm italic">No sibling information available</p>
                     </div>
@@ -694,10 +633,7 @@
             <!-- Tab 4: Status & Assignment -->
         <div id="statusTab" class="view-tab-content">
             <div class="view-section">
-                <h4 class="view-section-title">
-                    <i class="fas fa-tasks text-pccr-gold"></i>
-                    Application Status
-                </h4>
+                <h4 class="view-section-title">Application Status</h4>
                 <div class="view-grid">
                     <div class="view-field">
                         <label>Current Status</label>
@@ -722,9 +658,12 @@
         
         </div> 
         
-        <div class="modal-footer" style="justify-content: space-between;">
+        <div class="modal-footer" style="justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
             <button id="btnReject" class="btn-reject">
                 <i class="fas fa-times-circle mr-2"></i> Reject
+            </button>
+            <button id="btnPending" class="btn-pending">
+                <i class="fas fa-clock mr-2"></i> Set to Pending
             </button>
             <button id="btnApprove" class="btn-approve">
                 <i class="fas fa-check-circle mr-2"></i> Approve
@@ -735,7 +674,7 @@
 
 
     <!-- Scroll to Top Button -->
-    <button id="scrollTopBtn" class="fixed bottom-6 right-6 w-12 h-12 bg-gradient-to-br from-pccr-red to-pccr-red-dark text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 hidden z-40">
+    <button id="scrollTopBtn" class="scroll-top-btn hidden" aria-label="Scroll to top">
         <i class="fas fa-arrow-up"></i>
     </button>
 

@@ -469,7 +469,8 @@ body {
     margin-bottom: 0.5rem;
 }
 
-.form-label::after {
+/* NEW RULE: Only adds asterisk if the label has the 'required-field' class */
+.form-label.required-field::after {
     content: '*';
     color: #7b0200;
     margin-left: 4px;
@@ -499,6 +500,40 @@ body {
 
 .form-input::placeholder {
     color: #9ca3af;
+}
+
+/* File inputs (Documents step) */
+input[type="file"].form-input,
+input[type="file"].file-input {
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+}
+
+input[type="file"].form-input::-webkit-file-upload-button,
+input[type="file"].file-input::-webkit-file-upload-button {
+    padding: 0.4rem 0.75rem;
+    margin-right: 0.75rem;
+    background: linear-gradient(135deg, #7b0200 0%, #5a0100 100%);
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+input[type="file"].form-input:hover::-webkit-file-upload-button,
+input[type="file"].file-input:hover::-webkit-file-upload-button {
+    background: linear-gradient(135deg, #5a0100 0%, #3d0100 100%);
+}
+
+/* Honorable Dismissal conditional block */
+#honorableDismissalGroup {
+    transition: opacity 0.2s ease;
+}
+
+#honorableDismissalGroup[style*="display: none"] {
+    overflow: hidden;
 }
 
 .form-input.valid {
@@ -904,7 +939,7 @@ body {
 
 @media (max-width: 640px) {
     .step-label div:last-child {
-        display: none;suma
+        display: none;
     }
 }
 

@@ -27,6 +27,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body class="bg-gray-50 font-['Inter']">
     
@@ -80,12 +81,12 @@
                             <i class="fas fa-tasks"></i> Application Progress
                         </span>
                         <div class="text-right">
-                            <span id="progressPercent" class="text-pccr-gold font-bold text-sm">25%</span>
-                            <span id="timeEstimate" class="text-white/70 text-xs block">~8 min remaining</span>
+                            <span id="progressPercent" class="text-pccr-gold font-bold text-sm">20%</span>
+                            
                         </div>
                     </div>
                     <div class="h-3 bg-white/20 rounded-full overflow-hidden">
-                        <div id="progressBar" class="h-full bg-gradient-to-r from-pccr-gold to-yellow-300 rounded-full transition-all duration-500 ease-out" style="width: 25%"></div>
+                        <div id="progressBar" class="h-full bg-gradient-to-r from-pccr-gold to-yellow-300 rounded-full transition-all duration-500 ease-out" style="width: 20%"></div>
                     </div>
                     
                     <div class="flex justify-between mt-4 gap-2">
@@ -102,6 +103,10 @@
                             <div class="text-xs font-semibold">Education</div>
                         </div>
                         <div id="stepLabel4" class="step-label flex-1 text-center">
+                            <div class="text-white/50 text-lg mb-1"><i class="fas fa-file-upload"></i></div>
+                            <div class="text-xs font-semibold">Documents</div>
+                        </div>
+                        <div id="stepLabel5" class="step-label flex-1 text-center">
                             <div class="text-white/50 text-lg mb-1"><i class="fas fa-check-circle"></i></div>
                             <div class="text-xs font-semibold">Review</div>
                         </div>
@@ -126,7 +131,7 @@
                         <div class="space-y-6">
                             <div class="grid md:grid-cols-2 gap-6">
                                 <div class="form-group">
-                                    <label class="form-label">Student Category</label>
+                                    <label class="form-label required-field">Student Category</label>
                                     <select name="student_category" required class="form-input">
                                         <option value="">Select category</option>
                                         <option value="New Student">New Student</option>
@@ -137,26 +142,34 @@
                                 </div>
                             
                                 <div class="form-group">
-                                    <label class="form-label">Program Applied For</label>
-                                    <input type="text" name="program" required class="form-input" placeholder="e.g., BS Criminology">
-                                    <div class="error-message"></div>
-                                </div>
+                                <label class="form-label required-field">Program Applied For</label>
+                                <select name="program" required class="form-input">
+                                    <option value="">Select Program</option>
+                                    
+                                    <optgroup label="Graduate School">
+                                        <option value="Master of Science in Criminal Justice Education - Academic Track">Master of Science in Criminal Justice Education</option>
+                                        
+                                        <option value="Doctor of Criminal Justice Education - Professional Track">Doctor of Criminal Justice Education</option>
+                                    </optgroup>
+                            
+                                    <optgroup label="College">
+                                        <option value="Bachelor of Science in Criminology">Bachelor of Science in Criminology</option>
+                                        
+                                        <option value="Bachelor of Science in Industrial Security Management">Bachelor of Science in Industrial Security Management</option>
+                                        
+                                        <option value="Bachelor of Forensic Science">Bachelor of Forensic Science</option>
+                                    </optgroup>
+                            
+                                    <optgroup label="Senior High School">
+                                        <option value="General Academic">General Academic</option>
+                                    </optgroup>
+                                </select>
+                                <div class="error-message"></div>
+                            </div>
                             </div>
                             
-                            <div class="form-group mt-6">
-                                <label class="form-label">Agent <span class="text-gray-400 font-normal italic ml-1">(Optional)</span></label>
-                                <select name="agent" id="agentSelect" class="form-input" onchange="toggleManualAgent(this)">
-                                    <option value="">Select Agent</option>
-                                    </select>
-                                <small class="text-gray-500 text-xs mt-1">
-                                    <i class="fas fa-info-circle text-pccr-gold"></i> Select your agent if you were referred by one.
-                                </small>
-                            </div>
+                
                             
-                            <div id="manualAgentDiv" class="form-group mt-4 hidden bg-gray-50 p-4 rounded border border-gray-200">
-                                <label class="form-label">Enter Agent Name</label>
-                                <input type="text" name="manual_agent_name" class="form-input" placeholder="Type the name of your agent/referrer here...">
-                            </div>
                         </div>
 
                         <div class="flex justify-end mt-8">
@@ -180,7 +193,7 @@
                         <div class="space-y-6">
                             <div class="grid md:grid-cols-3 gap-6">
                                 <div class="form-group">
-                                    <label class="form-label">First Name</label>
+                                    <label class="form-label required-field">First Name</label>
                                     <input type="text" name="first_name" required class="form-input" placeholder="Juan">
                                     <div class="error-message"></div>
                                 </div>
@@ -192,21 +205,35 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="form-label">Last Name</label>
+                                    <label class="form-label required-field">Last Name</label>
                                     <input type="text" name="last_name" required class="form-input" placeholder="Dela Cruz">
                                     <div class="error-message"></div>
                                 </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Suffix</label>
+                                    <select name="suffix" class="form-input">
+                                        <option value="">None</option>
+                                        <option value="Jr.">Jr.</option>
+                                        <option value="Sr.">Sr.</option>
+                                        <option value="II">II</option>
+                                        <option value="III">III</option>
+                                        <option value="IV">IV</option>
+                                        <option value="V">V</option>
+                                    </select>
+                                </div>
+                                
                             </div>
 
                             <div class="grid md:grid-cols-2 gap-6">
                                 <div class="form-group">
-                                    <label class="form-label">Date of Birth</label>
+                                    <label class="form-label required-field">Date of Birth</label>
                                     <input type="date" name="date_of_birth" required class="form-input">
                                     <div class="error-message"></div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="form-label">Gender</label>
+                                    <label class="form-label required-field">Gender</label>
                                     <select name="gender" required class="form-input">
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
@@ -217,7 +244,7 @@
 
                             <div class="grid md:grid-cols-2 gap-6">
                                 <div class="form-group">
-                                    <label class="form-label">Email Address</label>
+                                    <label class="form-label required-field">Email Address</label>
                                     <input type="email" name="student_email_id" required class="form-input" placeholder="juan.delacruz@email.com">
                                     <small class="text-gray-500 text-xs mt-1 flex items-center gap-1">
                                         <i class="fas fa-info-circle text-pccr-gold"></i> We'll send important updates here
@@ -226,10 +253,10 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="form-label">Mobile Number</label>
-                                    <input type="text" name="student_mobile_number" required class="form-input" placeholder="09171234567">
+                                    <label class="form-label required-field">Mobile Number</label>
+                                    <input type="text" name="student_mobile_number" required class="form-input" placeholder="09XXXXXXXXX" maxlength="11" inputmode="numeric" pattern="[0-9]{11}" title="Please enter exactly 11 digits">
                                     <small class="text-gray-500 text-xs mt-1 flex items-center gap-1">
-                                        <i class="fas fa-phone text-pccr-gold"></i> Format: 09XXXXXXXXX
+                                        <i class="fas fa-phone text-pccr-gold"></i> Format: 09XXXXXXXXX (11 digits)
                                     </small>
                                     <div class="error-message"></div>
                                 </div>
@@ -245,7 +272,7 @@
                                 
                                 <div class="space-y-6">
                                     <div class="form-group max-w-md">
-                                        <label class="form-label">Are you living with your parents?</label>
+                                        <label class="form-label required-field">Are you living with your parents?</label>
                                         <select name="living_with_parents" class="form-input">
                                             <option value="Yes">Yes</option>
                                             <option value="No">No</option>
@@ -256,12 +283,12 @@
                                         <h4 class="text-sm font-bold text-gray-600 mb-4 uppercase tracking-wider">Father's Information</h4>
                                         <div class="grid md:grid-cols-4 gap-4">
                                             <div class="form-group">
-                                                <label class="form-label">Last Name</label>
+                                                <label class="form-label required-field">Last Name</label>
                                                 <input type="text" name="father_last_name" required class="form-input" placeholder="Last Name">
                                                 <div class="error-message"></div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="form-label">First Name</label>
+                                                <label class="form-label required-field">First Name</label>
                                                 <input type="text" name="father_first_name" required class="form-input" placeholder="First Name">
                                                 <div class="error-message"></div>
                                             </div>
@@ -271,7 +298,15 @@
                                             </div>
                                             <div class="form-group">
                                                 <label class="form-label">Suffix</label>
-                                                <input type="text" name="father_suffix" class="form-input" placeholder="e.g. Jr.">
+                                                <select name="suffix" class="form-input">
+                                                    <option value="">None</option>
+                                                    <option value="Jr.">Jr.</option>
+                                                    <option value="Sr.">Sr.</option>
+                                                    <option value="II">II</option>
+                                                    <option value="III">III</option>
+                                                    <option value="IV">IV</option>
+                                                    <option value="V">V</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -280,12 +315,12 @@
                                         <h4 class="text-sm font-bold text-gray-600 mb-4 uppercase tracking-wider">Mother's Information</h4>
                                         <div class="grid md:grid-cols-3 gap-4">
                                             <div class="form-group">
-                                                <label class="form-label">Last Name</label>
+                                                <label class="form-label required-field">Last Name</label>
                                                 <input type="text" name="mother_last_name" required class="form-input" placeholder="Maiden Last Name">
                                                 <div class="error-message"></div>
                                             </div>
                                             <div class="form-group">
-                                                <label class="form-label">First Name</label>
+                                                <label class="form-label required-field">First Name</label>
                                                 <input type="text" name="mother_first_name" required class="form-input" placeholder="First Name">
                                                 <div class="error-message"></div>
                                             </div>
@@ -308,73 +343,127 @@
                                 
                                 <div class="grid md:grid-cols-3 gap-6">
                                     <div class="form-group">
-                                        <label class="form-label">Full Name of Emergency Contact</label>
+                                        <label class="form-label required-field">Full Name of Emergency Contact</label>
                                         <input type="text" name="emergency_contact_name" required class="form-input" placeholder="Full Name">
                                         <div class="error-message"></div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Relationship</label>
-                                        <input type="text" name="emergency_relationship" required class="form-input" placeholder="e.g. Mother, Guardian">
+                                  <div class="form-group">
+                                        <label class="form-label required-field">Relationship</label>
+                                        <select name="emergency_relationship" required class="form-input">
+                                            <option value="">Select Relationship</option>
+                                            <option value="Father">Father</option>
+                                            <option value="Mother">Mother</option>
+                                            <option value="Guardian">Guardian</option>
+                                            <option value="Brother">Brother</option>
+                                            <option value="Sister">Sister</option>
+                                            <option value="Spouse">Spouse</option>
+                                            <option value="Relative">Relative</option>
+                                            <option value="Friend">Friend</option>
+                                            <option value="Other">Other</option>
+                                        </select>
                                         <div class="error-message"></div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="form-label">Contact Number</label>
-                                        <input type="text" name="emergency_contact_number" required class="form-input" placeholder="09XXXXXXXXX">
+                                        <label class="form-label required-field">Contact Number</label>
+                                        <input type="text" name="emergency_contact_number" required class="form-input" placeholder="09XXXXXXXXX" maxlength="11" inputmode="numeric" pattern="[0-9]{11}" title="Please enter exactly 11 digits">
+                                        <small class="text-gray-500 text-xs mt-1 flex items-center gap-1">
+                                            <i class="fas fa-phone text-pccr-gold"></i> Format: 09XXXXXXXXX (11 digits)
+                                        </small>
                                         <div class="error-message"></div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="border-t border-gray-100 pt-8 mt-8">
+                           <div class="border-t border-gray-100 pt-8 mt-8">
                                 <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
                                     <span class="w-8 h-8 bg-gray-100 text-pccr-red rounded-full flex items-center justify-center">
                                         <i class="fas fa-home text-sm"></i>
                                     </span>
                                     Home Address
                                 </h3>
+                            
+                                
                                 
                                 <div class="space-y-6">
                                     <div class="grid md:grid-cols-1 gap-6">
                                         <div class="form-group">
-                                            <label class="form-label">Address Line 1</label>
+                                            <label class="form-label required-field">Address Line 1</label>
                                             <input type="text" name="address_line_1" class="form-input" placeholder="House No., Street Name, Subdivision">
                                         </div>
-                                        <div class="form-group">
-                                            <label class="form-label">Address Line 2</label>
-                                            <input type="text" name="address_line_2" class="form-input" placeholder="Building, Apartment, or Landmark">
+                                    </div>
+                                    
+                                    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r">
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-info-circle text-red-500 mt-0.5"></i>
+                                            </div>
+                                            <div class="ml-3">
+                                                <h3 class="text-sm font-medium text-red-800">Please select in order:</h3>
+                                                <div class="mt-2 text-sm text-red-700">
+                                                    <ol class="list-decimal list-inside space-y-1">
+                                                        <li>Select <strong>Region</strong> first</li>
+                                                        <li>Then <strong>Province</strong> (automatically loads)</li>
+                                                        <li>Then <strong>City / Municipality</strong></li>
+                                                        <li>Finally, select your <strong>Barangay</strong></li>
+                                                    </ol>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
                                     <div class="grid md:grid-cols-2 gap-6">
                                         <div class="form-group">
-                                            <label class="form-label">Region</label>
-                                            <input type="text" name="region" class="form-input" placeholder="Region">
+                                            <label class="form-label required-field">Region</label>
+                                            <select name="region" id="regionSelect" required class="form-input">
+                                                <option value="">Select Region</option>
+                                            </select>
+                                            <div class="error-message"></div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="form-label">Province</label>
-                                            <input type="text" name="province" class="form-input" placeholder="Province">
+                                            <label class="form-label required-field">Province</label>
+                                            <select name="province" id="provinceSelect" required class="form-input" disabled>
+                                                <option value="">Select Province</option>
+                                            </select>
+                                            <div class="error-message"></div>
                                         </div>
                                     </div>
+                                    
+                                    <div class="grid md:grid-cols-2 gap-6">
+                                        <div class="form-group">
+                                            <label class="form-label required-field">City / Municipality</label>
+                                            <select name="city" id="citySelect" required class="form-input" disabled>
+                                                <option value="">Select City</option>
+                                            </select>
+                                            <div class="error-message"></div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label required-field">Barangay</label>
+                                            <select name="barangay" id="barangaySelect" required class="form-input" disabled>
+                                                <option value="">Select Barangay</option>
+                                            </select>
+                                            <div class="error-message"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <input type="hidden" name="region_text" id="regionText">
+                                    <input type="hidden" name="province_text" id="provinceText">
+                                    <input type="hidden" name="city_text" id="cityText">
+                                    <input type="hidden" name="barangay_text" id="barangayText">
 
                                     <div class="grid md:grid-cols-2 gap-6">
                                         <div class="form-group">
-                                            <label class="form-label">City / Municipality</label>
-                                            <input type="text" name="city" class="form-input" placeholder="City">
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">Barangay</label>
-                                            <input type="text" name="barangay" class="form-input" placeholder="Barangay">
-                                        </div>
-                                    </div>
-
-                                    <div class="grid md:grid-cols-2 gap-6">
-                                        <div class="form-group">
-                                            <label class="form-label">Zip Code / Pincode</label>
-                                            <input type="text" name="pincode" class="form-input" placeholder="Zip Code">
+                                            <label class="form-label required-field">Zip Code / Pincode</label>
+                                            <input type="text" name="pincode" required class="form-input" placeholder="Zip Code" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" title="Please enter exactly 4 digits">
+                                            <small class="text-gray-500 text-xs mt-1 flex items-center gap-1">
+                                                <i class="fas fa-map-pin text-pccr-gold"></i> Format: 4 digits
+                                            </small>
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Home Phone Number</label>
-                                            <input type="text" name="home_phone_number" class="form-input" placeholder="Landline Number">
+                                            <input type="text" name="home_phone_number" class="form-input" placeholder="Landline Number" maxlength="8" inputmode="numeric" pattern="[0-9]{8}" title="Please enter exactly 8 digits">
+                                            <small class="text-gray-500 text-xs mt-1 flex items-center gap-1">
+                                                <i class="fas fa-phone text-pccr-gold"></i> Format: 8 digits
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
@@ -457,12 +546,72 @@
                                 <i class="fas fa-arrow-left mr-2"></i> Back
                             </button>
                             <button type="button" onclick="nextStep(4)" class="btn-primary">
-                                Review Application <i class="fas fa-check ml-2"></i>
+                                Continue <i class="fas fa-arrow-right ml-2"></i>
                             </button>
                         </div>
                     </div>
 
                     <div id="step4" class="form-step">
+                        <div class="mb-6">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-3">
+                                <span class="w-10 h-10 bg-gradient-to-br from-pccr-red to-pccr-red-dark text-white rounded-full flex items-center justify-center">
+                                    <i class="fas fa-file-upload text-sm"></i>
+                                </span>
+                                Submit Required Documents
+                            </h2>
+                            <p class="text-gray-600 ml-13">Upload the following documents. Accepted formats: PDF, JPG, PNG.</p>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="form-group">
+                                <label class="form-label required-field">Form 138 (Grade 12 Report Card)</label>
+                                <input type="file" name="form_138" accept=".pdf,.jpg,.jpeg,.png" class="form-input file-input" data-docfield="form_138">
+                                <div class="error-message"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required-field">2x2 Picture</label>
+                                <small class="text-gray-500 text-xs block mt-1 mb-2">White background, with name tag, and in formal attire.</small>
+                                <input type="file" name="photo_2x2" accept=".jpg,.jpeg,.png" class="form-input file-input" data-docfield="photo_2x2">
+                                <div class="error-message"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required-field">Previous School ID or Government-Issued ID</label>
+                                <input type="file" name="government_id" accept=".pdf,.jpg,.jpeg,.png" class="form-input file-input" data-docfield="government_id">
+                                <div class="error-message"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required-field">Birth Certificate from Philippine Statistics Authority (PSA)</label>
+                                <input type="file" name="birth_certificate" accept=".pdf,.jpg,.jpeg,.png" class="form-input file-input" data-docfield="birth_certificate">
+                                <div class="error-message"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required-field">Certificate of Good Moral Character</label>
+                                <input type="file" name="good_moral" accept=".pdf,.jpg,.jpeg,.png" class="form-input file-input" data-docfield="good_moral">
+                                <div class="error-message"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Form 137 (Transcript of Records) — If available</label>
+                                <input type="file" name="form_137" accept=".pdf,.jpg,.jpeg,.png" class="form-input file-input" data-docfield="form_137">
+                                <div class="error-message"></div>
+                            </div>
+                            <div id="honorableDismissalGroup" class="form-group" style="display: none;">
+                                <label class="form-label required-field">Certificate of Honorable Dismissal (College Transferees)</label>
+                                <input type="file" name="honorable_dismissal" accept=".pdf,.jpg,.jpeg,.png" class="form-input file-input" data-docfield="honorable_dismissal">
+                                <div class="error-message"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between mt-8">
+                            <button type="button" onclick="prevStep(3)" class="btn-secondary">
+                                <i class="fas fa-arrow-left mr-2"></i> Back
+                            </button>
+                            <button type="button" onclick="nextStep(5)" class="btn-primary">
+                                Continue <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="step5" class="form-step">
                         <div class="text-center mb-8">
                             <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-100 to-green-50 rounded-full mb-4">
                                 <i class="fas fa-file-contract text-green-600 text-3xl"></i>
@@ -479,6 +628,10 @@
                                 <h5 class="font-bold text-gray-700 mb-2 text-sm">Educational History</h5>
                                 <div id="summarySchoolList" class="text-sm text-gray-600 italic">No schools added.</div>
                             </div>
+                            <div id="summaryDocuments" class="mt-4 pt-4 border-t border-gray-200">
+                                <h5 class="font-bold text-gray-700 mb-2 text-sm">Documents</h5>
+                                <div id="summaryDocumentList" class="text-sm text-gray-600 italic">—</div>
+                            </div>
                         </div>
 
                         <div class="bg-yellow-50 border-l-4 border-pccr-gold p-4 rounded mb-6">
@@ -492,7 +645,7 @@
                         </div>
 
                         <div class="flex justify-between mt-8">
-                            <button type="button" onclick="prevStep(3)" class="btn-secondary">
+                            <button type="button" onclick="prevStep(4)" class="btn-secondary">
                                 <i class="fas fa-arrow-left mr-2"></i> Back
                             </button>
                             <button type="button" onclick="submitForm()" id="submitBtn" class="btn-success">
@@ -504,103 +657,79 @@
                 </form>
 
                 <div id="successScreen" class="hidden py-8 px-4 sm:px-6 lg:px-8">
-                    <div class="max-w-3xl mx-auto">
+                    <div id="pdf-content" class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-sm">
                         
                         <div class="text-center mb-8">
-                             <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-100 to-green-50 rounded-full mb-4">
-                                <i class="fas fa-check text-green-600 text-3xl"></i>
-                            </div>
+                            <img src="https://cutover.pccr.edu.ph/files/pccr-logo.png" alt="PCCR Logo" class="w-24 h-24 mx-auto mb-4">
+                            <h2 class="text-2xl font-bold text-pccr-red font-['Poppins']">Philippine College of Criminology</h2>
+                            <p class="text-pccr-gold font-semibold text-sm tracking-wider mt-1">PRO BONO PUBLICO ET PATRIA</p>
+                            <h3 class="text-xl font-bold text-gray-800 mt-6">Student Admission Application</h3>
+                        </div>
+                
+                        <div class="text-center mb-8">
                             <h3 class="text-xl font-bold text-gray-800 mb-2">Hi <span id="successName" class="text-pccr-red">Student</span>!</h3>
-                            <h4 class="text-lg text-gray-700 font-semibold mb-2">Welcome to the Philippine College of Criminology (PCCR)!</h4>
                             <p class="text-gray-600 text-sm mb-6 max-w-2xl mx-auto">
                                 This confirms that you have successfully submitted your pre-application form for PCCR Criminology Education.
                             </p>
-                        </div>
-
-                        <div class="bg-yellow-50 border-2 border-dashed border-pccr-gold rounded-lg p-6 text-center mb-8 mx-auto max-w-md">
-                            <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Your Reference Number</p>
-                            <p id="successRefNo" class="text-4xl font-bold text-pccr-red tracking-wider font-mono">PENDING</p>
-                            <p class="text-xs text-red-500 mt-2 italic">*Please take a screenshot or save this number*</p>
-                        </div>
-
-                        <div class="mb-8">
-                            <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-                                <h4 class="font-bold text-gray-800 border-b border-gray-200 pb-3 mb-4 flex items-center gap-2">
-                                    <i class="fas fa-list-check text-pccr-gold"></i> Requirements to Submit
-                                </h4>
-                                <ul class="space-y-3 mb-4 text-sm text-gray-700">
-                                    <li class="flex items-start gap-3">
-                                        <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
-                                        <span>Form 138 (Grade 12 Report Card)</span>
-                                    </li>
-                                    <li class="flex items-start gap-3">
-                                        <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
-                                        <span>2x2 Picture (White background, with name tag)</span>
-                                    </li>
-                                    <li class="flex items-start gap-3">
-                                        <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
-                                        <span>PSA Birth Certificate (Original & Photocopy)</span>
-                                    </li>
-                                    <li class="flex items-start gap-3">
-                                        <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
-                                        <span>Certificate of Good Moral Character</span>
-                                    </li>
-                                    <li class="flex items-start gap-3">
-                                        <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
-                                        <span>SF10 / Form 137 (Copy of Grades)</span>
-                                    </li>
-                                    <li class="flex items-start gap-3">
-                                        <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
-                                        <span class="text-gray-500 italic">Wait for the Admissions Team to contact you for the schedule of examination.</span>
-                                    </li>
-                                </ul>
+                            
+                            <div class="bg-yellow-50 border-2 border-dashed border-pccr-gold rounded-lg p-4 inline-block">
+                                <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Your Reference Number</p>
+                                <p id="successRefNo" class="text-3xl font-bold text-pccr-red tracking-wider font-mono">PENDING</p>
                             </div>
                         </div>
-
-                        <div class="mb-8">
-                            <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                                <h4 class="font-bold text-gray-800 border-b border-gray-300 pb-2 mb-4 text-sm uppercase">Applicant Details</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8 text-sm">
-                                    <div>
-                                        <p class="text-gray-500 text-xs uppercase tracking-wider mb-1">Applicant Name</p>
-                                        <p id="summaryName" class="font-bold text-gray-900 text-base">-</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-gray-500 text-xs uppercase tracking-wider mb-1">Student Type</p>
-                                        <p id="summaryType" class="font-bold text-gray-900">-</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-gray-500 text-xs uppercase tracking-wider mb-1">Academic Department</p>
-                                        <p class="font-bold text-gray-900">College</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-gray-500 text-xs uppercase tracking-wider mb-1">Program</p>
-                                        <p id="summaryProgram" class="font-bold text-gray-900">-</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-gray-500 text-xs uppercase tracking-wider mb-1">Educational Level</p>
-                                        <p class="font-bold text-gray-900">Tertiary</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-gray-500 text-xs uppercase tracking-wider mb-1">Applicant Contact Number</p>
-                                        <p id="summaryMobile" class="font-bold text-gray-900">-</p>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <p class="text-gray-500 text-xs uppercase tracking-wider mb-1">Applicant Email Address</p>
-                                        <p id="summaryEmail" class="font-bold text-gray-900">-</p>
-                                    </div>
-                                </div>
-                            </div>
+                
+                        <div class="mb-8 border-t border-gray-200 pt-6">
+                            <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                <i class="fas fa-list-check text-pccr-gold"></i> Requirements to Submit
+                            </h4>
+                            <ul class="space-y-2 text-sm text-gray-700 pl-4">
+                                <li class="flex items-start gap-2"><i class="fas fa-check-circle text-green-500 mt-0.5"></i> Form 138 (Grade 12 Report Card)</li>
+                                <li class="flex items-start gap-2"><i class="fas fa-check-circle text-green-500 mt-0.5"></i> 2x2 Picture (White background, with name tag)</li>
+                                <li class="flex items-start gap-2"><i class="fas fa-check-circle text-green-500 mt-0.5"></i> PSA Birth Certificate (Original & Photocopy)</li>
+                                <li class="flex items-start gap-2"><i class="fas fa-check-circle text-green-500 mt-0.5"></i> Certificate of Good Moral Character</li>
+                                <li class="flex items-start gap-2"><i class="fas fa-check-circle text-green-500 mt-0.5"></i> SF10 / Form 137 (Copy of Grades)</li>
+                            </ul>
                         </div>
-
-                        <div class="text-center space-y-4">
-                            <p class="text-xs text-gray-500">
-                                For inquiries, feel free to email us at <a href="mailto:admissions@pccr.edu.ph" class="text-pccr-red font-bold hover:underline">admissions@pccr.edu.ph</a>
-                            </p>
-                            <a href="/" class="btn-primary inline-flex items-center justify-center">
-                                <i class="fas fa-home mr-2"></i> Return to Homepage
-                            </a>
+                
+                        <div class="mb-8 border-t border-gray-200 pt-6">
+                            <h4 class="font-bold text-gray-800 mb-4 text-sm uppercase">Applicant Details</h4>
+                            <div class="grid grid-cols-2 gap-y-4 gap-x-8 text-sm">
+                        <div>
+                            <p class="text-gray-500 text-xs uppercase">Applicant Name</p>
+                            <p id="summaryName" class="font-bold text-gray-900">-</p>
                         </div>
+                        
+                        <div>
+                            <p class="text-gray-500 text-xs uppercase">Student Type</p>
+                            <p id="summaryType" class="font-bold text-gray-900">-</p>
+                        </div>
+                    
+                    
+                        <div>
+                            <p class="text-gray-500 text-xs uppercase">Program</p>
+                            <p id="summaryProgram" class="font-bold text-gray-900">-</p>
+                        </div>
+                    
+                    
+                        <div>
+                            <p class="text-gray-500 text-xs uppercase">Contact Number</p>
+                            <p id="summaryMobile" class="font-bold text-gray-900">-</p>
+                        </div>
+                    
+                        <div class="col-span-2">
+                            <p class="text-gray-500 text-xs uppercase">Email Address</p>
+                            <p id="summaryEmail" class="font-bold text-gray-900">-</p>
+                        </div>
+                    </div>
+                        </div>
+                    </div> <div class="text-center space-y-4 mt-8">
+                        <button type="button" onclick="downloadPDF()" class="btn-primary inline-flex items-center justify-center bg-pccr-red hover:bg-pccr-red-dark">
+                            <i class="fas fa-file-pdf mr-2"></i> Download Application Form
+                        </button>
+                        <br>
+                        <a href="/" class="text-sm text-gray-600 hover:text-pccr-red font-semibold">
+                            <i class="fas fa-home mr-1"></i> Return to Homepage
+                        </a>
                     </div>
                 </div>
 
@@ -628,6 +757,58 @@
     <script>
         let addedSchools = [];
 
+        // Mobile Number Validation - Only 11 digits
+        const mobileInput = document.querySelector('input[name="student_mobile_number"]');
+        if (mobileInput) {
+            mobileInput.addEventListener('input', function(e) {
+                // Remove non-numeric characters
+                this.value = this.value.replace(/[^0-9]/g, '');
+                // Limit to 11 digits
+                if (this.value.length > 11) {
+                    this.value = this.value.slice(0, 11);
+                }
+            });
+        }
+
+        // Emergency Contact Number Validation - Only 11 digits
+        const emergencyInput = document.querySelector('input[name="emergency_contact_number"]');
+        if (emergencyInput) {
+            emergencyInput.addEventListener('input', function(e) {
+                // Remove non-numeric characters
+                this.value = this.value.replace(/[^0-9]/g, '');
+                // Limit to 11 digits
+                if (this.value.length > 11) {
+                    this.value = this.value.slice(0, 11);
+                }
+            });
+        }
+
+        // Home Phone Number Validation - Only 8 digits
+        const homePhoneInput = document.querySelector('input[name="home_phone_number"]');
+        if (homePhoneInput) {
+            homePhoneInput.addEventListener('input', function(e) {
+                // Remove non-numeric characters
+                this.value = this.value.replace(/[^0-9]/g, '');
+                // Limit to 8 digits
+                if (this.value.length > 8) {
+                    this.value = this.value.slice(0, 8);
+                }
+            });
+        }
+
+        // Zip Code / Pincode Validation - Only 4 digits
+        const pincodeInput = document.querySelector('input[name="pincode"]');
+        if (pincodeInput) {
+            pincodeInput.addEventListener('input', function(e) {
+                // Remove non-numeric characters
+                this.value = this.value.replace(/[^0-9]/g, '');
+                // Limit to 4 digits
+                if (this.value.length > 4) {
+                    this.value = this.value.slice(0, 4);
+                }
+            });
+        }
+
         // ALS Toggle
         function toggleAls(checkbox) {
             const container = document.getElementById('eduContainer');
@@ -638,26 +819,70 @@
             }
         }
 
-        // Add School Logic
+          // addSchool
+
         function addSchool() {
+            // 1. Get Values
             const level = $('#tempLevel').val();
-            const name = $('#tempSchoolName').val();
+            const name = $('#tempSchoolName').val().trim();
             const start = $('#tempYearStart').val();
             const end = $('#tempYearEnd').val();
-            const addr = $('#tempAddress').val();
-
-            if(!name) { alert("Please enter school name"); return; }
-
+            const addr = $('#tempAddress').val().trim();
+            
+            const currentYear = new Date().getFullYear();
+            const minYear = 1950; // <--- NEW: Define the oldest allowed year
+        
+            // 2. Validate: Check for Empty Fields
+            if (!name || !start || !end || !addr) {
+                if(typeof frappe !== 'undefined') {
+                    frappe.msgprint({title: 'Missing Information', message: 'Please fill in <b>all fields</b>.', indicator: 'red'});
+                } else {
+                    alert("Please fill in all fields (School Name, Years, and Address) before adding.");
+                }
+                return; 
+            }
+        
+            // 3. Validate: Numeric format
+            if (start.length !== 4 || end.length !== 4) {
+                alert("Please enter a valid 4-digit year (e.g., 2018).");
+                return;
+            }
+        
+            // 4. Validate: Ancient Year Check (NEW)
+            if (parseInt(start) < minYear || parseInt(end) < minYear) {
+                alert(`Invalid Year: Years cannot be earlier than ${minYear}.`);
+                return;
+            }
+        
+            // 5. Validate: Future Year Check
+            if (parseInt(start) > currentYear) {
+                alert("Year Started cannot be in the future.");
+                return;
+            }
+        
+            // 6. Validate: Date Logic (End < Start)
+            if (parseInt(end) < parseInt(start)) {
+                alert(`Invalid Date Range: Year Ended (${end}) cannot be before Year Started (${start}).`);
+                return;
+            }
+        
+            // 7. Success: Add to List
             const schoolObj = { level, name, start, end, addr };
             addedSchools.push(schoolObj);
             renderSchoolList();
-
-            // Clear inputs
+        
+            // 8. Clear inputs
             $('#tempSchoolName').val('');
             $('#tempYearStart').val('');
             $('#tempYearEnd').val('');
             $('#tempAddress').val('');
+            
+            // Optional: Toast notification
+            if(typeof frappe !== 'undefined') {
+                frappe.show_alert({message: 'School added successfully', indicator: 'green'});
+            }
         }
+
         function renderSchoolList() {
             const listContainer = $('#schoolList');
             listContainer.empty();

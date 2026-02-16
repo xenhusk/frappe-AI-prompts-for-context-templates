@@ -72,6 +72,35 @@ let filters = {
 
 ---
 
+## 🔒 Security Features
+
+**NEW:** Both portals now include robust role-based access control (RBAC).
+
+### Security Measures
+
+✅ **Authentication Check** - Verifies user is logged in (not Guest)  
+✅ **Authorization Check** - Validates user has required role(s)  
+✅ **Automatic Redirect** - Sends unauthorized users to login page  
+✅ **Error Messages** - Clear feedback on why access was denied  
+✅ **Post-Login Redirect** - Returns user to original portal after login
+
+### Portal Access Matrix
+
+| User Role | Head Portal | Staff Portal |
+|-----------|-------------|--------------|
+| Guest (Not logged in) | ❌ DENY | ❌ DENY |
+| Admission Head | ✅ ALLOW | ❌ DENY |
+| Admission Staff | ❌ DENY | ✅ ALLOW |
+| System Manager | ✅ ALLOW | ❌ DENY* |
+
+*System Manager access to Staff portal can be enabled if needed (see SECURITY_IMPLEMENTATION.md)
+
+**For detailed security documentation, see:**
+- `SECURITY_IMPLEMENTATION.md` - Complete security architecture
+- `SECURITY_TESTING_GUIDE.md` - Test cases and procedures
+
+---
+
 ## Setup in Frappe
 
 ### Step 1: Create Web Pages in Frappe
@@ -81,6 +110,7 @@ let filters = {
    - **Page Name:** `admission-portal-head`
    - **Route:** `/admission-head`
    - **Published:** ✅ Yes
+   - **Allow Guest:** ❌ No (IMPORTANT for security)
    - **Template:** Standard
    - Copy contents from `Admission Portal Head/index.html` to HTML section
    - Copy contents from `Admission Portal Head/style.css` to CSS section
@@ -91,6 +121,7 @@ let filters = {
    - **Page Name:** `admission-portal-staff`
    - **Route:** `/admission-staff`
    - **Published:** ✅ Yes
+   - **Allow Guest:** ❌ No (IMPORTANT for security)
    - **Template:** Standard
    - Copy contents from `Admission Portal Staff/index.html` to HTML section
    - Copy contents from `Admission Portal Staff/style.css` to CSS section
@@ -206,6 +237,31 @@ let filters = {
 | Approve/Reject | ✅ All apps | ✅ Assigned only |
 | Table Colspan | 7 | 6 |
 | Empty State | "No applications found" | "No applications assigned to you" |
+
+---
+
+## 🔒 Security Testing
+
+**CRITICAL:** Test security measures before production deployment!
+
+### Quick Security Tests
+
+1. **Test Guest Access:**
+   - Log out completely
+   - Try accessing both portal URLs directly
+   - Expected: Redirect to login with error message
+
+2. **Test Wrong Role:**
+   - Login as Admission Staff
+   - Try accessing Head portal URL
+   - Expected: Access denied, redirect to login
+
+3. **Test Correct Role:**
+   - Login as Admission Head
+   - Access Head portal
+   - Expected: Portal loads normally
+
+**Complete Testing:** See `SECURITY_TESTING_GUIDE.md` for all test cases
 
 ---
 

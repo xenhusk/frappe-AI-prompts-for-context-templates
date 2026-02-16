@@ -28,10 +28,86 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
 });
 
-// Frappe Ready - Simplified for Head portal
+// === SECURITY CHECK ===
+// Required roles for Admission Staff portal
+const REQUIRED_ROLES = ['Admission Staff'];
+
+function checkAccess() {
+    // Check if user is logged in
+    if (frappe.session.user === 'Guest') {
+        console.warn('🔒 Access Denied: User not logged in');
+        redirectToLogin('You must be logged in to access this page');
+        return false;
+    }
+    
+    // Get user roles from multiple sources (fallback chain)
+    let userRoles = [];
+    
+    if (frappe.boot && frappe.boot.user && frappe.boot.user.roles) {
+        userRoles = frappe.boot.user.roles;
+        console.log('✓ Roles from frappe.boot:', userRoles);
+    } else if (frappe.user_roles) {
+        userRoles = frappe.user_roles;
+        console.log('✓ Roles from frappe.user_roles:', userRoles);
+    } else if (frappe.session.user_roles) {
+        userRoles = frappe.session.user_roles;
+        console.log('✓ Roles from frappe.session.user_roles:', userRoles);
+    }
+    
+    // If no roles detected, allow access but log warning
+    // This prevents infinite redirect loops on web pages where roles aren't loaded
+    if (!userRoles || userRoles.length === 0) {
+        console.warn('⚠️ Warning: Could not detect user roles');
+        console.warn('User:', frappe.session.user);
+        console.warn('Allowing access - Please ensure Web Page permissions are configured');
+        console.warn('Required roles:', REQUIRED_ROLES);
+        return true; // Allow access rather than blocking
+    }
+    
+    // Check if user has any of the required roles
+    const hasAccess = REQUIRED_ROLES.some(role => userRoles.includes(role));
+    
+    if (!hasAccess) {
+        console.warn('🔒 Access Denied: User does not have required role');
+        console.warn('Required roles:', REQUIRED_ROLES);
+        console.warn('User roles:', userRoles);
+        redirectToLogin('You do not have permission to access the Admission Staff Portal');
+        return false;
+    }
+    
+    console.log('✓ Access Granted: User has required role');
+    return true;
+}
+
+function redirectToLogin(message) {
+    // Show alert with message
+    if (message) {
+        frappe.msgprint({
+            title: 'Access Denied',
+            indicator: 'red',
+            message: message
+        });
+        
+        // Wait a moment for message to show, then redirect
+        setTimeout(() => {
+            window.location.href = '/login?redirect-to=' + encodeURIComponent(window.location.pathname);
+        }, 1500);
+    } else {
+        // Immediate redirect
+        window.location.href = '/login?redirect-to=' + encodeURIComponent(window.location.pathname);
+    }
+}
+
+// Frappe Ready - With Security Check
 if (typeof frappe !== 'undefined') {
     frappe.ready(function() {
+        // SECURITY: Check access before initializing
+        if (!checkAccess()) {
+            return; // Stop execution if access denied
+        }
+        
         currentUserEmail = frappe.session.user;
+        console.log('🎓 Initializing Admission Staff Portal for:', currentUserEmail);
         initializeDashboard();
     });
 } else {
@@ -39,71 +115,29 @@ if (typeof frappe !== 'undefined') {
     window.addEventListener('load', function() {
         setTimeout(() => {
             currentUserEmail = 'demo@example.com'; 
+            console.log('⚠ Running in Demo Mode');
             initializeDashboard();
         }, 500);
     });
 }
 
 function initializeApp() {
-    // Hide loading screen with GSAP
+    // Hide loading screen
     setTimeout(() => {
-        if (typeof gsap !== 'undefined') {
-            gsap.to('#loadingScreen', {
-                opacity: 0,
-                duration: 0.5,
-                onComplete: () => {
-                    document.getElementById('loadingScreen').style.display = 'none';
-                }
-            });
-        } else {
-            document.getElementById('loadingScreen').style.display = 'none';
-        }
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) loadingScreen.style.display = 'none';
     }, 1200);
     
     // Preloader Safety Net - Force hide after 5 seconds no matter what
     setTimeout(() => {
         const loadingScreen = document.getElementById('loadingScreen');
         if (loadingScreen && loadingScreen.style.display !== 'none') {
-            console.warn('Loading screen forced to hide by safety net');
             loadingScreen.style.display = 'none';
         }
     }, 5000);
-
-    // Initialize animations
-    initializeAnimations();
     
     // Setup scroll to top
     setupScrollToTop();
-}
-
-function initializeAnimations() {
-    if (typeof gsap === 'undefined') return;
-    
-    // Animate dashboard entrance
-    gsap.from('.dashboard-header-card', {
-        opacity: 0,
-        y: -20,
-        duration: 0.6,
-        delay: 1.3,
-        ease: 'power3.out'
-    });
-
-    gsap.from('.metric-card', {
-        opacity: 0,
-        y: 30,
-        duration: 0.6,
-        delay: 1.5,
-        stagger: 0.1,
-        ease: 'power3.out'
-    });
-
-    gsap.from('.table-section', {
-        opacity: 0,
-        y: 30,
-        duration: 0.6,
-        delay: 1.8,
-        ease: 'power3.out'
-    });
 }
 
 // === DASHBOARD INITIALIZATION ===
@@ -177,9 +211,14 @@ function setupTableButtonListeners() {
 function setupModalListeners() {
     console.log('Setting up modal listeners...');
     
+    // Staff portal doesn't have assignment modal
+    // This function is not needed for staff portal
+    console.log('✓ Staff portal - No assignment modal needed');
+    return;
+    
     const modal = document.getElementById('assignmentModal');
     if (!modal) {
-        console.error('Modal not found');
+        console.log('Assignment modal not found (expected for Staff portal)');
         return;
     }
     
@@ -906,15 +945,7 @@ function confirmAssignment() {
 // === REFRESH DASHBOARD ===
 function refreshDashboard() {
     showToast('Refreshing dashboard...', 'info');
-    
-    // Add refresh animation
-    const btn = event.currentTarget;
-    btn.querySelector('i').classList.add('fa-spin');
-    
-    setTimeout(() => {
-        loadDashboardData();
-        btn.querySelector('i').classList.remove('fa-spin');
-    }, 1000);
+    loadDashboardData();
 }
 
 // === SECTION SWITCHING ===
@@ -943,6 +974,11 @@ function switchSection(sectionName) {
         // Initialize reports charts when switching to reports section
         if (sectionName === 'reports' && applicationsData.length > 0) {
             setTimeout(() => renderReportsCharts(), 100);
+        }
+        
+        // Initialize settings when switching to settings section
+        if (sectionName === 'settings') {
+            initializeSettings();
         }
     }
 }
@@ -1019,34 +1055,15 @@ function showToast(message, type = 'success') {
         info: 'fa-info-circle'
     };
     
-    toast.className = 'fixed top-6 right-6 bg-gradient-to-r from-pccr-red to-pccr-red-dark text-white px-6 py-4 rounded-lg shadow-2xl z-50 flex items-center gap-3';
+    toast.className = 'toast-notification';
+    toast.style.backgroundColor = '#24292e';
     toast.innerHTML = `
         <i class="fas ${icons[type] || icons.info}"></i>
         <span>${message}</span>
     `;
     
     document.body.appendChild(toast);
-
-    if (typeof gsap !== 'undefined') {
-        gsap.from(toast, {
-            x: 400,
-            opacity: 0,
-            duration: 0.3
-        });
-
-        setTimeout(() => {
-            gsap.to(toast, {
-                x: 400,
-                opacity: 0,
-                duration: 0.3,
-                onComplete: () => toast.remove()
-            });
-        }, 3000);
-    } else {
-        setTimeout(() => {
-            toast.remove();
-        }, 3000);
-    }
+    setTimeout(() => toast.remove(), 3000);
 }
 
 // === UTILITY FUNCTIONS ===
@@ -1158,9 +1175,25 @@ function populateViewModal(data) {
     
     // Staff can only approve/reject applications assigned to them
     const modalFooter = document.querySelector('#viewModal .modal-footer');
+    const btnApprove = document.getElementById('btnApprove');
+    const btnReject = document.getElementById('btnReject');
+    const btnPending = document.getElementById('btnPending');
+    const currentStatus = data.application_status;
+    
     if (modalFooter) {
         if (data.assigned_staff === frappe.session.user) {
             modalFooter.style.display = 'flex';
+            
+            // Enable/disable buttons based on current status
+            if (btnApprove) {
+                btnApprove.disabled = (currentStatus === 'APPROVED');
+            }
+            if (btnReject) {
+                btnReject.disabled = (currentStatus === 'REJECTED');
+            }
+            if (btnPending) {
+                btnPending.disabled = (currentStatus === 'PENDING' || !currentStatus);
+            }
         } else {
             modalFooter.style.display = 'none';
         }
@@ -1233,44 +1266,22 @@ function populateSiblingsList(siblings) {
 // Switch between view tabs
 // Switch between view tabs
 function switchViewTab(tabName) {
-    // 1. Update tab buttons
+    // Update tab buttons
     document.querySelectorAll('.view-tab').forEach(tab => {
         tab.classList.remove('active');
     });
-    document.querySelector(`.view-tab[data-tab="${tabName}"]`).classList.add('active');
+    const activeTabBtn = document.querySelector(`.view-tab[data-tab="${tabName}"]`);
+    if (activeTabBtn) activeTabBtn.classList.add('active');
     
-    // 2. Hide ALL tab contents first (Instant hide, no animation)
+    // Hide all tab contents, show target
     document.querySelectorAll('.view-tab-content').forEach(content => {
         content.classList.remove('active');
-        content.style.display = 'none'; // Force hide
-        content.style.opacity = '0';    // Reset opacity
+        content.style.display = 'none';
     });
-    
-    // 3. Prepare the target tab
     const targetTab = document.getElementById(`${tabName}Tab`);
     if (targetTab) {
         targetTab.classList.add('active');
-        targetTab.style.display = 'block'; // Make it part of layout so GSAP can calculate
-        
-        // 4. Animate using fromTo (Explicit Start AND End)
-        if (typeof gsap !== 'undefined') {
-            gsap.fromTo(targetTab, 
-                { 
-                    opacity: 0, 
-                    y: 10 
-                },
-                { 
-                    opacity: 1, 
-                    y: 0, 
-                    duration: 0.3,
-                    ease: "power2.out",
-                    clearProps: "transform" // Clean up transform after animation to prevent blurriness
-                }
-            );
-        } else {
-            // Fallback if GSAP fails
-            targetTab.style.opacity = '1';
-        }
+        targetTab.style.display = 'block';
     }
 }
 
@@ -1279,32 +1290,9 @@ function openViewModal() {
     const modal = document.getElementById('viewModal');
     if (!modal) return;
     
-    // Use a slight delay to ensure DOM is ready
-    setTimeout(() => {
-        modal.classList.add('modal-active');
-        document.body.style.overflow = 'hidden';
-        
-        // Reset to first tab
-        switchViewTab('admission');
-        
-        // Animate Modal Content
-        if (typeof gsap !== 'undefined') {
-            // Use fromTo for stability
-            gsap.fromTo('.view-modal-content', 
-                { 
-                    scale: 0.95, 
-                    opacity: 0 
-                },
-                { 
-                    scale: 1, 
-                    opacity: 1, 
-                    duration: 0.3, 
-                    ease: 'power2.out',
-                    clearProps: "transform" // Vital for text clarity after scaling
-                }
-            );
-        }
-    }, 50);
+    modal.classList.add('modal-active');
+    document.body.style.overflow = 'hidden';
+    switchViewTab('admission');
 }
 
 // Close view modal
@@ -1312,22 +1300,9 @@ function closeViewModal() {
     const modal = document.getElementById('viewModal');
     if (!modal) return;
     
-    if (typeof gsap !== 'undefined') {
-        gsap.to('.view-modal-content', {
-            scale: 0.95,
-            opacity: 0,
-            duration: 0.2,
-            onComplete: () => {
-                modal.classList.remove('modal-active');
-                document.body.style.overflow = '';
-                currentViewingApp = null;
-            }
-        });
-    } else {
-        modal.classList.remove('modal-active');
-        document.body.style.overflow = '';
-        currentViewingApp = null;
-    }
+    modal.classList.remove('modal-active');
+    document.body.style.overflow = '';
+    currentViewingApp = null;
 }
 
 // Setup view modal listeners
@@ -1367,6 +1342,14 @@ function setupViewModalListeners() {
     if (btnReject) {
         btnReject.addEventListener('click', function() {
             updateApplicationStatus('REJECTED');
+        });
+    }
+    
+    // Pending Button Listener
+    const btnPending = document.getElementById('btnPending');
+    if (btnPending) {
+        btnPending.addEventListener('click', function() {
+            updateApplicationStatus('PENDING');
         });
     }
     
@@ -1519,7 +1502,7 @@ function renderMyStatusChart() {
             fontFamily: 'Inter, sans-serif'
         },
         labels: ['Pending', 'Approved', 'Rejected'],
-        colors: ['#fcb31c', '#10b981', '#ef4444'],
+        colors: ['#fbbf24', '#4ade80', '#f87171'],
         legend: {
             position: 'bottom',
             fontSize: '14px'
@@ -1576,7 +1559,7 @@ function renderMyActivityChart() {
                 show: false
             }
         },
-        colors: ['#7b0200'],
+        colors: ['#60a5fa'],
         xaxis: {
             categories: activityData.dates
         },
@@ -1629,7 +1612,7 @@ function renderMyProcessingTimelineChart() {
             fontFamily: 'Inter, sans-serif',
             stacked: false
         },
-        colors: ['#10b981', '#ef4444'],
+        colors: ['#4ade80', '#f87171'],
         xaxis: {
             categories: timelineData.dates,
             labels: {
@@ -1693,7 +1676,7 @@ function renderMyProgramChart() {
                 distributed: true
             }
         },
-        colors: ['#7b0200', '#fcb31c', '#10b981', '#3b82f6'],
+        colors: ['#f87171', '#4ade80', '#fbbf24', '#60a5fa', '#94a3b8', '#a78bfa'],
         xaxis: {
             categories: Object.keys(programCounts)
         },
@@ -1728,7 +1711,7 @@ function renderMyWeeklyChart() {
             height: 350,
             fontFamily: 'Inter, sans-serif'
         },
-        colors: ['#7b0200'],
+        colors: ['#60a5fa'],
         xaxis: {
             categories: weeklyData.weeks
         },
@@ -1878,7 +1861,7 @@ function renderMyStatsTable() {
         html += `
             <tr>
                 <td style="font-weight: 600;">${stat.metric}</td>
-                <td style="font-size: 1.125rem; font-weight: 700; color: #7b0200;">${stat.value}</td>
+                <td style="font-size: 1.125rem; font-weight: 700; color: #24292e;">${stat.value}</td>
                 <td style="color: #6b7280;">${stat.status}</td>
             </tr>
         `;
@@ -1917,6 +1900,55 @@ function updateMetricsEnhanced() {
     }
 }
 
+// ========================================
+// SETTINGS & LOGOUT
+// ========================================
+
+// Initialize settings page with user info
+function initializeSettings() {
+    const emailElement = document.getElementById('settingsUserEmail');
+    if (emailElement && currentUserEmail) {
+        emailElement.textContent = currentUserEmail;
+    }
+}
+
+// Handle logout
+function handleLogout() {
+    // Confirm logout
+    if (!confirm('Are you sure you want to logout?')) {
+        return;
+    }
+    
+    console.log('🔐 Logging out user:', currentUserEmail);
+    
+    // Demo Mode
+    if (typeof frappe === 'undefined') {
+        showToast('Logged out successfully (Demo Mode)', 'info');
+        setTimeout(() => {
+            window.location.href = 'https://abakada-coco.s.frappe.cloud/login?redirect-to=%2F#login';
+        }, 500);
+        return;
+    }
+    
+    // Show loading message
+    showToast('Logging out...', 'info');
+    
+    // Frappe logout
+    frappe.call({
+        method: 'logout',
+        callback: function(r) {
+            console.log('✓ Logout successful');
+            // Redirect to login page
+            window.location.href = 'https://abakada-coco.s.frappe.cloud/login?redirect-to=%2F#login';
+        },
+        error: function(err) {
+            console.error('Logout error:', err);
+            // Force redirect even on error
+            window.location.href = 'https://abakada-coco.s.frappe.cloud/login?redirect-to=%2F#login';
+        }
+    });
+}
+
 // === EXPOSE FUNCTIONS TO WINDOW ===
 window.viewApplication = viewApplication;
 window.openAssignmentModal = openAssignmentModal;
@@ -1926,8 +1958,8 @@ window.refreshDashboard = refreshDashboard;
 window.showNotifications = showNotifications;
 window.switchViewTab = switchViewTab;
 window.printApplication = printApplication;
+window.handleLogout = handleLogout;
 
 // === CONSOLE MESSAGE ===
-console.log('%c🎓 PCCR Admission Portal - STAFF', 'color: #7b0200; font-size: 20px; font-weight: bold;');
-console.log('%cPro Bono Publico et Patria', 'color: #fcb31c; font-style: italic;');
+console.log('%cAdmission Portal - Staff', 'color: #24292e; font-size: 14px; font-weight: 600;');
 console.log('%cUsing DocType: ' + DOCTYPE_NAME, 'color: #666; font-size: 12px;');
